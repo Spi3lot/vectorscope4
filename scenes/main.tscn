@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3 uid="uid://dygko6sukr467"]
+
+[ext_resource type="Script" path="res://scripts/vectorscope.gd" id="1_uuccd"]
+
+[sub_resource type="Gradient" id="Gradient_pxt0g"]
+offsets = PackedFloat32Array()
+colors = PackedColorArray()
+
+[node name="Node2D" type="Node2D" node_paths=PackedStringArray("line", "audio_player", "select_file_dialog")]
+script = ExtResource("1_uuccd")
+max_points = 4096
+line = NodePath("Line2D")
+audio_player = NodePath("AudioStreamPlayer")
+select_file_dialog = NodePath("FileDialog")
+
+[node name="Line2D" type="Line2D" parent="."]
+points = PackedVector2Array(0, 0)
+width = 1.0
+gradient = SubResource("Gradient_pxt0g")
+joint_mode = 2
+antialiased = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+position = Vector2i(0, 36)
+size = Vector2i(500, 500)
+visible = true
+ok_button_text = "Open"
+dialog_hide_on_ok = true
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.wav", "*.mp3")
