@@ -1,8 +1,13 @@
-[gd_resource type="AudioBusLayout" load_steps=2 format=3 uid="uid://b3kfwrvx17gmb"]
+[gd_resource type="AudioBusLayout" load_steps=3 format=3 uid="uid://b3kfwrvx17gmb"]
+
+[sub_resource type="AudioEffectPanner" id="AudioEffectPanner_f6voh"]
+resource_name = "Panner"
 
 [sub_resource type="AudioEffectCapture" id="AudioEffectCapture_7snps"]
 resource_name = "Capture"
 
 [resource]
-bus/0/effect/0/effect = SubResource("AudioEffectCapture_7snps")
+bus/0/effect/0/effect = SubResource("AudioEffectPanner_f6voh")
 bus/0/effect/0/enabled = true
+bus/0/effect/1/effect = SubResource("AudioEffectCapture_7snps")
+bus/0/effect/1/enabled = true

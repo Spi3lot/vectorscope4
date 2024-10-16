@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://bujjt8dnhsfx5"]
-
-[node name="Line2D" type="Line2D"]
-points = PackedVector2Array(0, 0, 0, 0)
-width = 1.0
-default_color = Color(0, 1, 0, 1)
-joint_mode = 2
-antialiased = true
