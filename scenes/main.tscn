@@ -1,5 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://dygko6sukr467"]
+[gd_scene load_steps=6 format=3 uid="uid://dygko6sukr467"]
 
+[ext_resource type="Script" path="res://scripts/AudioLoopbackRecorder.cs" id="1_i8e63"]
 [ext_resource type="Script" path="res://scripts/vectorscope.gd" id="1_uuccd"]
 [ext_resource type="Script" path="res://scripts/vectorscope_sub_viewport_container.gd" id="2_x10s1"]
 [ext_resource type="Script" path="res://scripts/vectorscope_sub_viewport.gd" id="3_fgrir"]
@@ -7,9 +8,14 @@
 
 [node name="Root" type="Node2D"]
 
+[node name="AudioLoopbackRecorder" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("1_i8e63")
+
 [node name="Vectorscope" type="Node2D" parent="." node_paths=PackedStringArray("audio_player", "select_file_dialog", "sub_viewport_container")]
 unique_name_in_owner = true
 script = ExtResource("1_uuccd")
+use_loopback = true
 audio_player = NodePath("AudioStreamPlayer")
 select_file_dialog = NodePath("FileDialog")
 sub_viewport_container = NodePath("VectorscopeSubViewportContainer")
@@ -57,19 +63,24 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="Label" type="Label" parent="UI/Volume"]
-layout_mode = 0
-offset_top = 224.0
-offset_right = 59.0
-offset_bottom = 247.0
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 4.125
+anchor_right = 0.575
+anchor_bottom = 5.6
+offset_top = 59.0
+offset_right = 36.0
+offset_bottom = 23.0
 rotation = -1.57079
 text = "Volume"
 
 [node name="VSlider" type="VSlider" parent="UI/Volume"]
 layout_mode = 2
-offset_left = 16.0
-offset_top = 24.0
-offset_right = 40.0
-offset_bottom = 224.0
+anchor_left = 0.4
+anchor_top = 0.6
+anchor_right = 1.0
+anchor_bottom = 5.6
+offset_bottom = -1.52588e-05
 tooltip_text = "Linear amplitude of the audio"
 mouse_default_cursor_shape = 16
 max_value = 2.0
@@ -83,16 +94,19 @@ offset_right = 96.0
 offset_bottom = 40.0
 
 [node name="Label" type="Label" parent="UI/Pan"]
-layout_mode = 0
-offset_right = 59.0
-offset_bottom = 23.0
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.475
+anchor_bottom = 0.575
 text = "Pan"
+metadata/_edit_use_anchors_ = true
 
 [node name="HSlider" type="HSlider" parent="UI/Pan"]
-layout_mode = 0
-offset_top = 16.0
-offset_right = 272.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.4
+anchor_right = 6.8
+anchor_bottom = 1.0
 tooltip_text = "Panning of the stereo audio from left to right and inbetween"
 mouse_default_cursor_shape = 16
 min_value = -1.0
@@ -115,10 +129,11 @@ text = "Speed / Pitch
 "
 
 [node name="HSlider" type="HSlider" parent="UI/Speed"]
-layout_mode = 0
-offset_top = 16.0
-offset_right = 272.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.4
+anchor_right = 6.8
+anchor_bottom = 1.0
 tooltip_text = "Multiplier for the song speed and pitch"
 mouse_default_cursor_shape = 16
 max_value = 4.0
@@ -134,16 +149,19 @@ offset_right = 96.0
 offset_bottom = 168.0
 
 [node name="Label" type="Label" parent="UI/Penalty"]
-layout_mode = 0
-offset_right = 59.0
-offset_bottom = 23.0
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 2.375
+anchor_bottom = 0.575
+offset_right = -36.0
 text = "Line Penalty"
 
 [node name="HSlider" type="HSlider" parent="UI/Penalty"]
-layout_mode = 0
-offset_top = 16.0
-offset_right = 272.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.4
+anchor_right = 6.8
+anchor_bottom = 1.0
 tooltip_text = "Factor that scales the darkness of a line based on its length"
 mouse_default_cursor_shape = 16
 value = 20.0
@@ -156,21 +174,25 @@ offset_right = 96.0
 offset_bottom = 232.0
 
 [node name="Label" type="Label" parent="UI/Longevity"]
-layout_mode = 0
-offset_right = 83.0
-offset_bottom = 23.0
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 3.2
+anchor_bottom = 0.575
+offset_right = -45.0
 text = "Frame Longevity"
 
 [node name="HSlider" type="HSlider" parent="UI/Longevity"]
-layout_mode = 0
-offset_top = 16.0
-offset_right = 272.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.4
+anchor_right = 6.8
+anchor_bottom = 1.0
 tooltip_text = "Lifetime of each drawn frame of lines"
 mouse_default_cursor_shape = 16
 max_value = 1.0
 step = 0.01
 value = 0.5
+metadata/_edit_use_anchors_ = true
 
 [node name="Seek" type="Control" parent="UI"]
 layout_mode = 3
@@ -180,11 +202,10 @@ offset_bottom = 40.0
 
 [node name="HSlider" type="HSlider" parent="UI/Seek"]
 layout_mode = 2
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = 612.0
-offset_right = 1152.0
-offset_bottom = 628.0
+anchor_top = 15.8
+anchor_right = 28.8
+anchor_bottom = 16.2
+offset_top = -6.10352e-05
 mouse_default_cursor_shape = 2
 max_value = 1.0
 step = 0.001

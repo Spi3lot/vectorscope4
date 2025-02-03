@@ -5,17 +5,24 @@ static var line_positions := PackedVector2Array()
 static var line_colors := PackedColorArray()
     
 static func draw_vectorscope(vectorscope: Vectorscope):
-    var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
-    var available := capture.get_frames_available()
-    
-    if vectorscope.audio_player.stream_paused || available == 0:
-        return
-
+    var available := 0
     var previous_frame := frame_buffer[-1]
-    frame_buffer = capture.get_buffer(available)
+    
+    if vectorscope.use_loopback:
+        frame_buffer = AudioLoopbackRecorder.Buffer
+        available = len(frame_buffer)
+    else:
+        var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
+        available = capture.get_frames_available()
+
+        if vectorscope.audio_player.stream_paused || available == 0:
+            return
+
+        frame_buffer = capture.get_buffer(available)
+        
     line_positions.resize(available * 2)
     line_colors.resize(available)
-    
+
     for i in range(available):
         var frame := frame_buffer[i]
         line_positions[i * 2] = _get_point_from_frame(previous_frame, vectorscope)
