@@ -1,5 +1,10 @@
-extends Control
+extends CanvasLayer
 
+@export var loopback_button: CheckButton
+@export var longevity_slider: HSlider
+@export var penalty_slider: HSlider
+@export var pan_control: Control
+@export var speed_control: Control
 @export var seek_slider: HSlider
 
 var dragging := false
@@ -12,9 +17,10 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-    if !dragging:
-        var audio_player: AudioStreamPlayer = %Vectorscope.audio_player
-        seek_slider.value = audio_player.get_playback_position() / audio_player.stream.get_length()
+    var player: AudioStreamPlayer = %Vectorscope.audio_player
+
+    if not dragging and player.stream:
+        seek_slider.value = player.get_playback_position() / player.stream.get_length()
 
     
 func _show_ui():
@@ -30,12 +36,21 @@ func _respond():
     var min_aspect := mini(viewport_size.x, viewport_size.y)
     seek_slider.size.x = viewport_size.x
     seek_slider.position.y = viewport_size.y - 36
+    loopback_button.button_pressed = %Vectorscope.loopback
     %Vectorscope.sub_viewport_container.position.x = (viewport_size.x - min_aspect) / 2
     %Vectorscope.sub_viewport_container.sub_viewport.size = Vector2i(min_aspect, min_aspect)
 
 
 func _on_volume_value_changed(value: float) -> void:
     %Vectorscope.audio_player.volume_db = linear_to_db(value)
+
+
+func _on_longevity_value_changed(value: float) -> void:
+    %Vectorscope.fade_color.a = 1 - value
+
+
+func _on_penalty_value_changed(value: float) -> void:
+    %Vectorscope.length_penalty = value
 
 
 func _on_pan_value_changed(value: float) -> void:
@@ -45,22 +60,24 @@ func _on_pan_value_changed(value: float) -> void:
 
 func _on_speed_value_changed(value: float) -> void:
     %Vectorscope.audio_player.pitch_scale = value
-
-
-func _on_penalty_value_changed(value: float) -> void:
-    %Vectorscope.length_penalty = value
-
-
+    
 func _on_seek_drag_started() -> void:
     dragging = true
-
-
-func _on_longevity_value_changed(value: float) -> void:
-    %Vectorscope.fade_color.a = 1 - value
 
 
 func _on_seek_drag_ended(value_changed: bool) -> void:
     if value_changed:
         %Vectorscope.audio_player.seek(seek_slider.value * %Vectorscope.audio_player.stream.get_length())
-        
+
     dragging = false
+
+
+func _on_loopback_toggled(toggled_on: bool) -> void:
+    WasapiLoopbackRecorder.SetRecording(toggled_on)
+    pan_control.visible = not toggled_on
+    speed_control.visible = not toggled_on
+    %FileDialog.visible = not toggled_on
+    %Vectorscope.loopback = toggled_on
+    
+    if (toggled_on):
+        %Vectorscope.audio_player.stream = null

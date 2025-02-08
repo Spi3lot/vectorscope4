@@ -24,7 +24,9 @@
 
 #I honestly don't care that much, Kopimi ftw, but it's my little baby and I want it to look nice :3
 
-class_name AudioLoader
+
+extends Node
+#class_name AudioLoader
 
 func report_errors(err, filepath):
     # See: https://docs.godotengine.org/en/latest/classes/class_@globalscope.html#enum-globalscope-error

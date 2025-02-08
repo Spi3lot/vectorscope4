@@ -3,25 +3,26 @@ class_name VectorscopeDraw
 static var frame_buffer := PackedVector2Array([Vector2.ZERO])
 static var line_positions := PackedVector2Array()
 static var line_colors := PackedColorArray()
+static var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
     
 static func draw_vectorscope(vectorscope: Vectorscope):
-    var available := 0
-    var previous_frame := frame_buffer[-1]
-    
-    if vectorscope.use_loopback:
-        frame_buffer = AudioLoopbackRecorder.Buffer
-        available = len(frame_buffer)
+    var available: int = WasapiLoopbackRecorder.GetFramesAvailable() \
+        if vectorscope.loopback \
+        else capture.get_frames_available()
+        
+    if available == 0:
+        return
+
+    if vectorscope.loopback:
+        frame_buffer = WasapiLoopbackRecorder.ReadStereo(available)
+    elif vectorscope.audio_player.stream_paused:
+        return
     else:
-        var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
-        available = capture.get_frames_available()
-
-        if vectorscope.audio_player.stream_paused || available == 0:
-            return
-
         frame_buffer = capture.get_buffer(available)
         
     line_positions.resize(available * 2)
     line_colors.resize(available)
+    var previous_frame := frame_buffer[-1]
 
     for i in range(available):
         var frame := frame_buffer[i]
