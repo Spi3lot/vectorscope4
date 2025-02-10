@@ -1,36 +1,11 @@
 [gd_scene load_steps=5 format=3 uid="uid://dygko6sukr467"]
 
-[ext_resource type="Script" uid="uid://c1rvbtg30w35y" path="res://scripts/vectorscope.gd" id="1_uuccd"]
+[ext_resource type="Script" uid="uid://c6a4ab76lw0la" path="res://scripts/vectorscope.gd" id="1_uuccd"]
 [ext_resource type="Script" uid="uid://bx2dfhfudvr6m" path="res://scripts/vectorscope_sub_viewport_container.gd" id="2_x10s1"]
 [ext_resource type="Script" uid="uid://1rqqiw54h1pl" path="res://scripts/vectorscope_sub_viewport.gd" id="3_fgrir"]
 [ext_resource type="Script" uid="uid://bsxnyrqat418p" path="res://scripts/ui.gd" id="3_lpaer"]
 
 [node name="Root" type="Node2D"]
-
-[node name="Vectorscope" type="Node2D" parent="." node_paths=PackedStringArray("audio_player", "sub_viewport_container")]
-unique_name_in_owner = true
-script = ExtResource("1_uuccd")
-loopback = true
-audio_player = NodePath("AudioStreamPlayer")
-sub_viewport_container = NodePath("VectorscopeSubViewportContainer")
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Vectorscope"]
-
-[node name="VectorscopeSubViewportContainer" type="SubViewportContainer" parent="Vectorscope" node_paths=PackedStringArray("sub_viewport")]
-offset_right = 512.0
-offset_bottom = 512.0
-script = ExtResource("2_x10s1")
-sub_viewport = NodePath("VectorscopeSubViewport")
-
-[node name="VectorscopeSubViewport" type="SubViewport" parent="Vectorscope/VectorscopeSubViewportContainer" node_paths=PackedStringArray("drawer")]
-disable_3d = true
-handle_input_locally = false
-render_target_clear_mode = 1
-render_target_update_mode = 4
-script = ExtResource("3_fgrir")
-drawer = NodePath("Drawer")
-
-[node name="Drawer" type="Node2D" parent="Vectorscope/VectorscopeSubViewportContainer/VectorscopeSubViewport"]
 
 [node name="FileDialog" type="FileDialog" parent="."]
 unique_name_in_owner = true
@@ -45,32 +20,57 @@ filters = PackedStringArray("*.wav, *.mp3", "*.wav", "*.mp3")
 show_hidden_files = true
 use_native_dialog = true
 
-[node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("loopback_button", "longevity_slider", "penalty_slider", "pan_control", "speed_control", "seek_slider")]
-script = ExtResource("3_lpaer")
-loopback_button = NodePath("HBoxContainer/VBoxContainer/Loopback/CheckButton")
-longevity_slider = NodePath("HBoxContainer/VBoxContainer/Longevity/HSlider")
-penalty_slider = NodePath("HBoxContainer/VBoxContainer/Penalty/HSlider")
-pan_control = NodePath("HBoxContainer/VBoxContainer/Pan")
-speed_control = NodePath("HBoxContainer/VBoxContainer/Speed")
-seek_slider = NodePath("Seek/HSlider")
-metadata/_edit_use_anchors_ = true
+[node name="Vectorscope" type="Node2D" parent="." node_paths=PackedStringArray("audio_player", "sub_viewport_container")]
+unique_name_in_owner = true
+script = ExtResource("1_uuccd")
+audio_player = NodePath("AudioStreamPlayer")
+sub_viewport_container = NodePath("VectorscopeSubViewportContainer")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="UI"]
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Vectorscope"]
+
+[node name="VectorscopeSubViewportContainer" type="SubViewportContainer" parent="Vectorscope" node_paths=PackedStringArray("sub_viewport")]
 anchors_preset = -1
-anchor_top = 0.0373457
-anchor_right = 0.194
-anchor_bottom = 0.395
-offset_top = -0.200001
-offset_right = 0.511993
-offset_bottom = 0.0399933
+anchor_right = 0.444
+anchor_bottom = 0.79
+offset_right = 0.511963
+offset_bottom = 0.0799866
+script = ExtResource("2_x10s1")
+sub_viewport = NodePath("VectorscopeSubViewport")
+
+[node name="VectorscopeSubViewport" type="SubViewport" parent="Vectorscope/VectorscopeSubViewportContainer" node_paths=PackedStringArray("drawer")]
+disable_3d = true
+handle_input_locally = false
+render_target_clear_mode = 1
+render_target_update_mode = 4
+script = ExtResource("3_fgrir")
+drawer = NodePath("Drawer")
+
+[node name="Drawer" type="Node2D" parent="Vectorscope/VectorscopeSubViewportContainer/VectorscopeSubViewport"]
+
+[node name="UI" type="MarginContainer" parent="." node_paths=PackedStringArray("volume_label", "volume_slider", "loopback_button", "longevity_slider", "penalty_slider", "pan_control", "speed_control", "seek_slider")]
+offset_right = 50.0
+offset_bottom = 200.0
+theme_override_constants/margin_top = 10
+script = ExtResource("3_lpaer")
+volume_label = NodePath("HBox/Volume/Label")
+volume_slider = NodePath("HBox/Volume/VSlider")
+loopback_button = NodePath("HBox/VBox/Loopback/CheckButton")
+longevity_slider = NodePath("HBox/VBox/Longevity/HSlider")
+penalty_slider = NodePath("HBox/VBox/Penalty/HSlider")
+pan_control = NodePath("HBox/VBox/Pan")
+speed_control = NodePath("HBox/VBox/Speed")
+seek_slider = NodePath("Seek/HSlider")
+
+[node name="HBox" type="HBoxContainer" parent="UI"]
+layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_constants/separation = 50
 
-[node name="Volume" type="Control" parent="UI/HBoxContainer"]
+[node name="Volume" type="Control" parent="UI/HBox"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/HBoxContainer/Volume"]
+[node name="Label" type="Label" parent="UI/HBox/Volume"]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.77
@@ -82,7 +82,7 @@ grow_vertical = 0
 rotation = -1.57079
 text = "Volume"
 
-[node name="VSlider" type="VSlider" parent="UI/HBoxContainer/Volume"]
+[node name="VSlider" type="VSlider" parent="UI/HBox/Volume"]
 layout_mode = 1
 anchors_preset = -1
 anchor_bottom = 1.0
@@ -90,46 +90,69 @@ offset_left = 16.0
 offset_right = 32.0
 grow_horizontal = 2
 grow_vertical = 2
-tooltip_text = "Linear amplitude of the audio"
+tooltip_text = "Linear amplitude/scale of the audio/plot"
 mouse_default_cursor_shape = 16
 max_value = 2.0
 step = 0.1
 value = 1.0
+allow_greater = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/HBoxContainer"]
+[node name="VBox" type="VBoxContainer" parent="UI/HBox"]
 layout_mode = 2
 theme_override_constants/separation = 50
 
-[node name="Loopback" type="Control" parent="UI/HBoxContainer/VBoxContainer"]
+[node name="Loopback" type="Control" parent="UI/HBox/VBox"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/HBoxContainer/VBoxContainer/Loopback"]
+[node name="Label" type="Label" parent="UI/HBox/VBox/Loopback"]
 layout_mode = 1
 anchors_preset = -1
 offset_right = 75.0
 offset_bottom = 23.0
 text = "Loopback"
 
-[node name="CheckButton" type="CheckButton" parent="UI/HBoxContainer/VBoxContainer/Loopback"]
+[node name="CheckButton" type="CheckButton" parent="UI/HBox/VBox/Loopback"]
 layout_mode = 2
-offset_left = 80.0
-offset_right = 124.0
-offset_bottom = 24.0
+offset_left = -6.0
+offset_top = 20.0
+offset_right = 38.0
+offset_bottom = 44.0
 tooltip_text = "Whether to capture all currently replayed audio or play a specific audio file"
+mouse_default_cursor_shape = 16
 
-[node name="Longevity" type="Control" parent="UI/HBoxContainer/VBoxContainer"]
+[node name="AntiAliasing" type="Control" parent="UI/HBox/VBox"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/HBoxContainer/VBoxContainer/Longevity"]
+[node name="Label" type="Label" parent="UI/HBox/VBox/AntiAliasing"]
 layout_mode = 1
 anchors_preset = -1
-anchor_right = 3.2
-anchor_bottom = 0.575
-offset_right = 128.0
+offset_right = 75.0
 offset_bottom = 23.0
-text = "Frame Longevity"
+text = "Line Antialiasing"
 
-[node name="HSlider" type="HSlider" parent="UI/HBoxContainer/VBoxContainer/Longevity"]
+[node name="CheckButton" type="CheckButton" parent="UI/HBox/VBox/AntiAliasing"]
+layout_mode = 2
+offset_left = -6.0
+offset_top = 20.0
+offset_right = 38.0
+offset_bottom = 44.0
+tooltip_text = "Whether to antialias lines or not"
+mouse_default_cursor_shape = 16
+button_pressed = true
+
+[node name="Width" type="Control" parent="UI/HBox/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/HBox/VBox/Width"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 2.375
+anchor_bottom = 0.575
+offset_right = 95.0
+offset_bottom = 23.0
+text = "Line Width"
+
+[node name="HSlider" type="HSlider" parent="UI/HBox/VBox/Width"]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.4
@@ -138,16 +161,16 @@ anchor_bottom = 1.0
 offset_top = 20.0
 offset_right = 172.0
 offset_bottom = 36.0
-tooltip_text = "Lifetime of each drawn frame of lines"
+tooltip_text = "How wide each line appears"
 mouse_default_cursor_shape = 16
-max_value = 1.0
-step = 0.01
-value = 0.5
+min_value = 1.0
+max_value = 10.0
+value = 1.0
 
-[node name="Penalty" type="Control" parent="UI/HBoxContainer/VBoxContainer"]
+[node name="Penalty" type="Control" parent="UI/HBox/VBox"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/HBoxContainer/VBoxContainer/Penalty"]
+[node name="Label" type="Label" parent="UI/HBox/VBox/Penalty"]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 2.375
@@ -156,7 +179,7 @@ offset_right = 95.0
 offset_bottom = 23.0
 text = "Line Penalty"
 
-[node name="HSlider" type="HSlider" parent="UI/HBoxContainer/VBoxContainer/Penalty"]
+[node name="HSlider" type="HSlider" parent="UI/HBox/VBox/Penalty"]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.4
@@ -169,17 +192,44 @@ tooltip_text = "Factor that scales the darkness of a line based on its length"
 mouse_default_cursor_shape = 16
 value = 20.0
 
-[node name="Pan" type="Control" parent="UI/HBoxContainer/VBoxContainer"]
+[node name="Longevity" type="Control" parent="UI/HBox/VBox"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/HBoxContainer/VBoxContainer/Pan"]
+[node name="Label" type="Label" parent="UI/HBox/VBox/Longevity"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 3.2
+anchor_bottom = 0.575
+offset_right = 128.0
+offset_bottom = 23.0
+text = "Frame Longevity"
+
+[node name="HSlider" type="HSlider" parent="UI/HBox/VBox/Longevity"]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.4
+anchor_right = 6.8
+anchor_bottom = 1.0
+offset_top = 20.0
+offset_right = 172.0
+offset_bottom = 36.0
+tooltip_text = "Lifetime of each drawn frame of lines"
+mouse_default_cursor_shape = 16
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="Pan" type="Control" parent="UI/HBox/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/HBox/VBox/Pan"]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.475
 anchor_bottom = 0.575
 text = "Pan"
 
-[node name="HSlider" type="HSlider" parent="UI/HBoxContainer/VBoxContainer/Pan"]
+[node name="HSlider" type="HSlider" parent="UI/HBox/VBox/Pan"]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.4
@@ -194,22 +244,21 @@ min_value = -1.0
 max_value = 1.0
 step = 0.1
 
-[node name="Speed" type="Control" parent="UI/HBoxContainer/VBoxContainer"]
+[node name="Speed" type="Control" parent="UI/HBox/VBox"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/HBoxContainer/VBoxContainer/Speed"]
+[node name="Label" type="Label" parent="UI/HBox/VBox/Speed"]
 layout_mode = 0
 offset_right = 101.0
 offset_bottom = 48.0
 text = "Speed / Pitch
 "
 
-[node name="HSlider" type="HSlider" parent="UI/HBoxContainer/VBoxContainer/Speed"]
+[node name="HSlider" type="HSlider" parent="UI/HBox/VBox/Speed"]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.4
-anchor_right = 6.8
-anchor_bottom = 1.0
+anchor_bottom = 0.4
 offset_top = 20.0
 offset_right = 172.0
 offset_bottom = 36.0
@@ -217,36 +266,33 @@ grow_horizontal = 2
 grow_vertical = 2
 tooltip_text = "Multiplier for the song speed and pitch"
 mouse_default_cursor_shape = 16
+min_value = 0.01
 max_value = 4.0
 step = 0.25
-value = 1.0
+value = 1.01
 
 [node name="Seek" type="Control" parent="UI"]
-layout_mode = 3
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -16.0
-offset_right = 40.0
-grow_vertical = 0
+layout_mode = 2
 
 [node name="HSlider" type="HSlider" parent="UI/Seek"]
 layout_mode = 2
-anchor_right = 28.8
-anchor_bottom = 0.999998
-offset_top = -6.10352e-05
-offset_bottom = 8.7738e-05
+anchor_top = -0.05
+anchor_bottom = -0.05
+offset_top = 632.0
+offset_right = 1152.0
+offset_bottom = 648.0
 mouse_default_cursor_shape = 2
 max_value = 1.0
 step = 0.001
 scrollable = false
-metadata/_edit_use_anchors_ = true
 
-[connection signal="value_changed" from="UI/HBoxContainer/Volume/VSlider" to="UI" method="_on_volume_value_changed"]
-[connection signal="toggled" from="UI/HBoxContainer/VBoxContainer/Loopback/CheckButton" to="UI" method="_on_loopback_toggled"]
-[connection signal="value_changed" from="UI/HBoxContainer/VBoxContainer/Longevity/HSlider" to="UI" method="_on_longevity_value_changed"]
-[connection signal="value_changed" from="UI/HBoxContainer/VBoxContainer/Penalty/HSlider" to="UI" method="_on_penalty_value_changed"]
-[connection signal="value_changed" from="UI/HBoxContainer/VBoxContainer/Pan/HSlider" to="UI" method="_on_pan_value_changed"]
-[connection signal="value_changed" from="UI/HBoxContainer/VBoxContainer/Speed/HSlider" to="UI" method="_on_speed_value_changed"]
+[connection signal="value_changed" from="UI/HBox/Volume/VSlider" to="UI" method="_on_volume_value_changed"]
+[connection signal="toggled" from="UI/HBox/VBox/Loopback/CheckButton" to="UI" method="_on_loopback_toggled"]
+[connection signal="toggled" from="UI/HBox/VBox/AntiAliasing/CheckButton" to="UI" method="_on_antialiasing_toggled"]
+[connection signal="value_changed" from="UI/HBox/VBox/Width/HSlider" to="UI" method="_on_width_value_changed"]
+[connection signal="value_changed" from="UI/HBox/VBox/Penalty/HSlider" to="UI" method="_on_penalty_value_changed"]
+[connection signal="value_changed" from="UI/HBox/VBox/Longevity/HSlider" to="UI" method="_on_longevity_value_changed"]
+[connection signal="value_changed" from="UI/HBox/VBox/Pan/HSlider" to="UI" method="_on_pan_value_changed"]
+[connection signal="value_changed" from="UI/HBox/VBox/Speed/HSlider" to="UI" method="_on_speed_value_changed"]
 [connection signal="drag_ended" from="UI/Seek/HSlider" to="UI" method="_on_seek_drag_ended"]
 [connection signal="drag_started" from="UI/Seek/HSlider" to="UI" method="_on_seek_drag_started"]

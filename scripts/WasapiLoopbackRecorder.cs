@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 using Godot;
 
@@ -18,6 +19,8 @@ public partial class WasapiLoopbackRecorder : Node
     private readonly MemoryStream _memoryStream = new();
 
     private readonly BinaryReader _memoryReader;
+    
+    private readonly object _streamLock = new();
 
     [Export]
     private bool _writeToFile;
@@ -27,6 +30,8 @@ public partial class WasapiLoopbackRecorder : Node
         _waveFormat = _capture.WaveFormat;
         _memoryReader = new BinaryReader(_memoryStream);
     }
+
+    private float Scale { get; set; } = 1;
 
     public override void _EnterTree()
     {
@@ -38,8 +43,12 @@ public partial class WasapiLoopbackRecorder : Node
 
         _capture.DataAvailable += (_, args) =>
         {
-            memoryWriter.Write(args.Buffer, 0, args.BytesRecorded);
             fileWriter?.Write(args.Buffer, 0, args.BytesRecorded);
+            
+            lock (_streamLock)
+            {
+                memoryWriter.Write(args.Buffer, 0, args.BytesRecorded);
+            }
         };
 
         _capture.RecordingStopped += (_, _) => fileWriter?.Dispose();
@@ -56,31 +65,26 @@ public partial class WasapiLoopbackRecorder : Node
         else _capture.StopRecording();
     }
 
-    private long GetFramesAvailable() => _memoryStream.Length / _waveFormat.BlockAlign;
+    public long GetFramesAvailable() => _memoryStream.Length / _waveFormat.BlockAlign;
 
     private Vector2[] ReadStereo(long frames)
     {
         var vectors = new Vector2[frames];
-        _memoryStream.Position = 0;
-        
-        for (long i = 0; i < frames; i++)
-        {
-            float x = _memoryReader.ReadSingle();
-            float y = _waveFormat.Channels >= 2 ? _memoryReader.ReadSingle() : x;
-            vectors[i] = new Vector2(x, y);
 
-            for (int j = 0; j < _waveFormat.Channels - 2; j++)
+        lock (_streamLock)
+        {
+            for (long i = 0; i < frames; i++)
             {
-                _memoryReader.ReadSingle();
+                _memoryStream.Position = i * _waveFormat.BlockAlign;
+                float x = _memoryReader.ReadSingle();
+                float y = (_waveFormat.Channels >= 2) ? _memoryReader.ReadSingle() : x;
+                vectors[i] = new Vector2(x, y) * Scale;
             }
-        }
 
-        if (_memoryStream.Position == _memoryStream.Length)
-        {
             _memoryStream.Position = 0;
             _memoryStream.SetLength(0);
         }
-        
+
         return vectors;
     }
 

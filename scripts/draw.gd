@@ -34,7 +34,16 @@ static func draw_vectorscope(vectorscope: Vectorscope):
     var sub_viewport := vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
     sub_viewport.drawer.draw_rect(rect, vectorscope.fade_color, true)
-    sub_viewport.drawer.draw_multiline_colors(line_positions, line_colors)
+    
+    # We have to use multiline instead of polyline because
+    # multiline uses segment-by-segment coloring, while
+    # polyline uses point-by-point coloring
+    sub_viewport.drawer.draw_multiline_colors(
+        line_positions,
+        line_colors,
+        vectorscope.line_width,
+        vectorscope.line_antialiasing
+    )
 
 
 static func _get_point_from_frame(frame: Vector2, vectorscope: Vectorscope) -> Vector2:

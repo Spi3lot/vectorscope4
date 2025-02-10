@@ -2,8 +2,10 @@ extends Node2D
 class_name Vectorscope
 
 @export_group("Configuration")
-@export var loopback := false
+@export var loopback := true
 @export_range(0, 100) var length_penalty := 20
+@export_range(1, 10) var line_width := 1
+@export var line_antialiasing := true
 @export var line_color := Color.GREEN
 @export var fade_color := Color(0, 0, 0, 0.5)
 
