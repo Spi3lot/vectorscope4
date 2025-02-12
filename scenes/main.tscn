@@ -23,14 +23,13 @@ ok_button_text = "Open"
 dialog_hide_on_ok = true
 file_mode = 0
 access = 2
-filters = PackedStringArray("*.wav, *.mp3", "*.wav", "*.mp3")
+filters = PackedStringArray("*.wav", "*.mp3")
 show_hidden_files = true
 use_native_dialog = true
 
 [node name="Vectorscope" type="Node2D" parent="." node_paths=PackedStringArray("audio_player", "sub_viewport_container")]
 unique_name_in_owner = true
 script = ExtResource("1_uuccd")
-line_glow = 10.0
 audio_player = NodePath("AudioStreamPlayer")
 sub_viewport_container = NodePath("VectorscopeSubViewportContainer")
 

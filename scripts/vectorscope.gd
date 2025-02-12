@@ -21,7 +21,7 @@ class_name Vectorscope
         line_width = value
         _optimize_line_width()
 
-@export_range(1, 10) var line_glow := 0.25
+@export_range(0, 1) var line_glow := 0.25
 @export_range(0, 100) var length_penalty := 20
 @export_range(0, 1) var plot_scale := 1.0
 @export var line_color := Color.GREEN

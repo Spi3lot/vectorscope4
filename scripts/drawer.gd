@@ -55,7 +55,7 @@ func _draw() -> void:
     sub_viewport.drawer.draw_multiline_colors(
         line_positions,
         line_whites,
-        abs(%Vectorscope.line_width) * %Vectorscope.line_glow,
+        %Vectorscope.line_glow * (1 if %Vectorscope.line_width < 0 else %Vectorscope.line_width),
         %Vectorscope.line_antialiasing
     )
 
