@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 
 using Godot;
 
@@ -12,29 +9,39 @@ namespace Vectorscope.Scripts;
 public partial class WasapiLoopbackRecorder : Node
 {
 
-    private readonly WasapiLoopbackCapture _capture = new();
-
-    private readonly WaveFormat _waveFormat;
+    private readonly object _streamLock = new();
 
     private readonly MemoryStream _memoryStream = new();
 
     private readonly BinaryReader _memoryReader;
-    
-    private readonly object _streamLock = new();
+
+    private WasapiLoopbackCapture _capture;
+
+    private WaveFormat _waveFormat;
 
     [Export]
     private bool _writeToFile;
 
     private WasapiLoopbackRecorder()
     {
-        _waveFormat = _capture.WaveFormat;
         _memoryReader = new BinaryReader(_memoryStream);
     }
 
     private float Scale { get; set; } = 1;
 
-    public override void _EnterTree()
+    public void SetRecording(bool value)
     {
+        if (!value)
+        {
+            _capture.Dispose();
+            _capture = null;
+            _waveFormat = null;
+            return;
+        }
+
+        _capture = new WasapiLoopbackCapture();
+        _waveFormat = _capture.WaveFormat;
+
         var memoryWriter = new WaveFileWriter(_memoryStream, _waveFormat);
 
         var fileWriter = (_writeToFile)
@@ -44,7 +51,7 @@ public partial class WasapiLoopbackRecorder : Node
         _capture.DataAvailable += (_, args) =>
         {
             fileWriter?.Write(args.Buffer, 0, args.BytesRecorded);
-            
+
             lock (_streamLock)
             {
                 memoryWriter.Write(args.Buffer, 0, args.BytesRecorded);
@@ -52,17 +59,7 @@ public partial class WasapiLoopbackRecorder : Node
         };
 
         _capture.RecordingStopped += (_, _) => fileWriter?.Dispose();
-    }
-
-    public override void _ExitTree()
-    {
-        _capture.Dispose();
-    }
-
-    private void SetRecording(bool value)
-    {
-        if (value) _capture.StartRecording();
-        else _capture.StopRecording();
+        _capture.StartRecording();
     }
 
     public long GetFramesAvailable() => _memoryStream.Length / _waveFormat.BlockAlign;

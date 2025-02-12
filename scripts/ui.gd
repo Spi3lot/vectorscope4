@@ -26,12 +26,9 @@ func _process(_delta: float) -> void:
         seek_slider.value = player.get_playback_position() / player.stream.get_length()
 
 
-# TODO: fix volume/scale slider
 func _respond():
     var viewport_size: Vector2i = get_viewport().size
     var min_aspect := mini(viewport_size.x, viewport_size.y)
-    seek_slider.size.x = viewport_size.x
-    seek_slider.position.y = viewport_size.y - 36
     %Vectorscope.sub_viewport_container.position = (viewport_size - Vector2i(min_aspect, min_aspect)) / 2
     %Vectorscope.sub_viewport_container.sub_viewport.size = Vector2i(min_aspect, min_aspect)
 
@@ -45,6 +42,8 @@ func _hide_ui():
     
 
 func _on_volume_value_changed(value: float) -> void:
+    %Vectorscope.plot_scale = value
+    
     if %Vectorscope.loopback:
         WasapiLoopbackRecorder.Scale = value
     else:
@@ -57,6 +56,10 @@ func _on_penalty_value_changed(value: float) -> void:
 
 func _on_width_value_changed(value: float) -> void:
     %Vectorscope.line_width = value
+
+
+func _on_glow_value_changed(value: float) -> void:
+    %Vectorscope.line_glow = value
 
 
 func _on_antialiasing_toggled(toggled_on: bool) -> void:
@@ -92,11 +95,9 @@ func _on_loopback_toggled(toggled_on: bool) -> void:
     pan_control.visible = not toggled_on
     speed_control.visible = not toggled_on
     seek_slider.visible = not toggled_on
-    %FileDialog.visible = not toggled_on
     %Vectorscope.loopback = toggled_on
     
     if toggled_on:
-        %Vectorscope.audio_player.stream = null
         volume_slider.value = WasapiLoopbackRecorder.Scale
         volume_label.text = "Scale"
     else:
