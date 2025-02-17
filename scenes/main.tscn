@@ -90,11 +90,11 @@ layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.77
 anchor_bottom = 0.967
-offset_top = 59.0
+offset_top = 59.5
 offset_right = 59.0
-offset_bottom = 32.9
+offset_bottom = 13.55
 grow_horizontal = 2
-grow_vertical = 2
+grow_vertical = 0
 rotation = -1.57079
 text = "Volume"
 
@@ -104,7 +104,6 @@ anchors_preset = -1
 anchor_bottom = 1.0
 offset_left = 16.0
 offset_right = 32.0
-grow_horizontal = 2
 grow_vertical = 2
 tooltip_text = "Linear amplitude/scale of the audio/plot"
 focus_mode = 0
@@ -126,6 +125,8 @@ layout_mode = 1
 anchors_preset = -1
 offset_right = 75.0
 offset_bottom = 23.0
+grow_horizontal = 2
+grow_vertical = 0
 text = "Loopback"
 
 [node name="CheckButton" type="CheckButton" parent="UI/HBox/VBox/Loopback"]
