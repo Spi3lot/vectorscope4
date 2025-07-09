@@ -1,4 +1,4 @@
-extends Node2D
+extends Control
 class_name Vectorscope
 
 @export_group("Configuration")

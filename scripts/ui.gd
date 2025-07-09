@@ -13,10 +13,8 @@ var dragging := false
 
 func _ready() -> void:
     loopback_button.button_pressed = %Vectorscope.loopback
-    _respond()
-    get_tree().root.size_changed.connect(_respond)
-    get_tree().root.mouse_entered.connect(_show_ui)
-    get_tree().root.mouse_exited.connect(_hide_ui)
+    get_tree().root.mouse_entered.connect(func(): visible = true)
+    get_tree().root.mouse_exited.connect(func(): visible = false)
 
 
 func _process(_delta: float) -> void:
@@ -24,21 +22,6 @@ func _process(_delta: float) -> void:
 
     if not dragging and player.stream:
         seek_slider.value = player.get_playback_position() / player.stream.get_length()
-
-
-func _respond():
-    var viewport_size: Vector2i = get_viewport().size
-    var min_aspect := mini(viewport_size.x, viewport_size.y)
-    %Vectorscope.sub_viewport_container.position = (viewport_size - Vector2i(min_aspect, min_aspect)) / 2
-    %Vectorscope.sub_viewport_container.sub_viewport.size = Vector2i(min_aspect, min_aspect)
-
-
-func _show_ui():
-    visible = true
-    
-    
-func _hide_ui():
-    visible = false
     
 
 func _on_volume_value_changed(value: float) -> void:
