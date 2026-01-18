@@ -23,6 +23,7 @@ class_name Vectorscope
 
 @export_range(0, 1) var line_glow := 0.25
 @export_range(0, 100) var length_penalty := 20
+@export_range(256, 4096, 256) var frame_buffer_size := 2048
 @export_range(0, 1) var plot_scale := 1.0
 @export var line_color := Color.GREEN
 @export var fade_color := Color(0, 0, 0, 0.5)

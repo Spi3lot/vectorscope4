@@ -15,22 +15,21 @@ func _draw() -> void:
     var available: int = WasapiLoopbackRecorder.GetFramesAvailable() \
         if %Vectorscope.loopback \
         else capture.get_frames_available()
-        
-    if available == 0 or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
+
+    if available < %Vectorscope.frame_buffer_size or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
         return
 
     var previous_frame := frame_buffer[-1]
     
-    if %Vectorscope.loopback:
-        frame_buffer = WasapiLoopbackRecorder.ReadStereo(available)
-    else:
-        frame_buffer = capture.get_buffer(available)
-        
-    line_positions.resize(available * 2)
-    line_colors.resize(available)
-    line_whites.resize(available)
+    frame_buffer = WasapiLoopbackRecorder.GetBuffer(%Vectorscope.frame_buffer_size) \
+        if %Vectorscope.loopback \
+        else capture.get_buffer(%Vectorscope.frame_buffer_size)
 
-    for i in range(available):
+    line_positions.resize(%Vectorscope.frame_buffer_size * 2)
+    line_colors.resize(%Vectorscope.frame_buffer_size)
+    line_whites.resize(%Vectorscope.frame_buffer_size)
+
+    for i in range(%Vectorscope.frame_buffer_size):
         var frame := frame_buffer[i]
         line_positions[i * 2] = _get_point_from_frame(previous_frame)
         line_positions[i * 2 + 1] = _get_point_from_frame(frame)
