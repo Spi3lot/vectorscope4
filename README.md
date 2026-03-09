@@ -2,7 +2,7 @@ Download on **itch.io**: [Vectorscope V4 by Spi3lot](https://spi3lot.itch.io/vec
 
 This tool gives you the ability to visualize stereo songs! And mono ones as well, but that'll look pretty boring. More than 2 channels are sadly not supported yet.
 
-It plots the left audio channel on the horizontal axis and the right audio channel on the vertical axis proportional to their respective amplitudes.
+It plots the left audio channel on the horizontal axis and the right audio channel on the vertical axis proportionally to their respective amplitudes.
 
 This is the fourth version in my series of vectorscopes/oscilloscopes, this time severely optimized using Godot.
 
