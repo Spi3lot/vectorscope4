@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dey7wd4sj1xjr"]
+[gd_scene format=3 uid="uid://dey7wd4sj1xjr"]
 
 [ext_resource type="Script" uid="uid://c6a4ab76lw0la" path="res://scripts/vectorscope.gd" id="1_uuccd"]
 [ext_resource type="Script" uid="uid://bx2dfhfudvr6m" path="res://scripts/vectorscope_sub_viewport_container.gd" id="2_x10s1"]
@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://bsxnyrqat418p" path="res://scripts/ui.gd" id="3_lpaer"]
 [ext_resource type="Script" uid="uid://02nwm3yn0pe2" path="res://scripts/drawer.gd" id="4_tbgi4"]
 
-[node name="Main" type="Control"]
+[node name="Main" type="Control" unique_id=776964101]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,7 +15,7 @@ grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="FileDialog" type="FileDialog" parent="."]
+[node name="FileDialog" type="FileDialog" parent="." unique_id=848782951]
 unique_name_in_owner = true
 title = "Open a File"
 position = Vector2i(9, 36)
@@ -28,7 +28,7 @@ filters = PackedStringArray("*.wav", "*.mp3")
 show_hidden_files = true
 use_native_dialog = true
 
-[node name="Vectorscope" type="Control" parent="." node_paths=PackedStringArray("audio_player", "sub_viewport_container")]
+[node name="Vectorscope" type="Control" parent="." unique_id=298533818 node_paths=PackedStringArray("audio_player", "sub_viewport_container")]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -37,14 +37,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_uuccd")
-frame_buffer_size = 4096
 audio_player = NodePath("AudioStreamPlayer")
 sub_viewport_container = NodePath("VectorscopeSubViewportContainer")
 metadata/_edit_lock_ = true
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Vectorscope"]
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Vectorscope" unique_id=1540043901]
 
-[node name="VectorscopeSubViewportContainer" type="SubViewportContainer" parent="Vectorscope" node_paths=PackedStringArray("sub_viewport")]
+[node name="VectorscopeSubViewportContainer" type="SubViewportContainer" parent="Vectorscope" unique_id=784740499 node_paths=PackedStringArray("sub_viewport")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -55,7 +54,7 @@ stretch = true
 script = ExtResource("2_x10s1")
 sub_viewport = NodePath("VectorscopeSubViewport")
 
-[node name="VectorscopeSubViewport" type="SubViewport" parent="Vectorscope/VectorscopeSubViewportContainer" node_paths=PackedStringArray("drawer")]
+[node name="VectorscopeSubViewport" type="SubViewport" parent="Vectorscope/VectorscopeSubViewportContainer" unique_id=529493362 node_paths=PackedStringArray("drawer")]
 disable_3d = true
 handle_input_locally = false
 size = Vector2i(1152, 648)
@@ -64,12 +63,12 @@ render_target_update_mode = 4
 script = ExtResource("3_fgrir")
 drawer = NodePath("Drawer")
 
-[node name="Drawer" type="Node2D" parent="Vectorscope/VectorscopeSubViewportContainer/VectorscopeSubViewport"]
+[node name="Drawer" type="Node2D" parent="Vectorscope/VectorscopeSubViewportContainer/VectorscopeSubViewport" unique_id=2036080093]
 script = ExtResource("4_tbgi4")
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="." unique_id=499037899]
 
-[node name="MarginContainer" type="MarginContainer" parent="UI" node_paths=PackedStringArray("volume_label", "volume_slider", "loopback_button", "longevity_slider", "penalty_slider", "pan_control", "speed_control", "seek_slider")]
+[node name="MarginContainer" type="MarginContainer" parent="UI" unique_id=25295232 node_paths=PackedStringArray("volume_label", "volume_slider", "loopback_button", "longevity_slider", "penalty_slider", "pan_control", "speed_control", "seek_slider")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -90,16 +89,16 @@ speed_control = NodePath("HBox/VBox/Speed")
 seek_slider = NodePath("HSlider")
 metadata/_edit_lock_ = true
 
-[node name="HBox" type="HBoxContainer" parent="UI/MarginContainer"]
+[node name="HBox" type="HBoxContainer" parent="UI/MarginContainer" unique_id=997080329]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_constants/separation = 50
 
-[node name="Volume" type="Control" parent="UI/MarginContainer/HBox"]
+[node name="Volume" type="Control" parent="UI/MarginContainer/HBox" unique_id=1721121384]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MarginContainer/HBox/Volume"]
+[node name="Label" type="Label" parent="UI/MarginContainer/HBox/Volume" unique_id=858546287]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.923
@@ -113,7 +112,7 @@ grow_vertical = 0
 rotation = -1.57079
 text = "Volume"
 
-[node name="VSlider" type="VSlider" parent="UI/MarginContainer/HBox/Volume"]
+[node name="VSlider" type="VSlider" parent="UI/MarginContainer/HBox/Volume" unique_id=593845710]
 layout_mode = 1
 anchors_preset = -1
 anchor_bottom = 1.091
@@ -132,14 +131,14 @@ value = 2.0
 exp_edit = true
 allow_greater = true
 
-[node name="VBox" type="VBoxContainer" parent="UI/MarginContainer/HBox"]
+[node name="VBox" type="VBoxContainer" parent="UI/MarginContainer/HBox" unique_id=1564175526]
 layout_mode = 2
 theme_override_constants/separation = 50
 
-[node name="Loopback" type="Control" parent="UI/MarginContainer/HBox/VBox"]
+[node name="Loopback" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=1964010904]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Loopback"]
+[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Loopback" unique_id=275947001]
 layout_mode = 1
 anchors_preset = -1
 offset_right = 75.0
@@ -148,7 +147,7 @@ grow_horizontal = 2
 grow_vertical = 0
 text = "Loopback"
 
-[node name="CheckButton" type="CheckButton" parent="UI/MarginContainer/HBox/VBox/Loopback"]
+[node name="CheckButton" type="CheckButton" parent="UI/MarginContainer/HBox/VBox/Loopback" unique_id=347432273]
 layout_mode = 0
 offset_left = -6.0
 offset_top = 20.0
@@ -158,16 +157,16 @@ tooltip_text = "Whether to capture all currently replayed audio or play a specif
 focus_mode = 0
 mouse_default_cursor_shape = 16
 
-[node name="AntiAliasing" type="Control" parent="UI/MarginContainer/HBox/VBox"]
+[node name="AntiAliasing" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=1071967015]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/AntiAliasing"]
+[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/AntiAliasing" unique_id=1914796632]
 layout_mode = 1
 offset_right = 127.0
 offset_bottom = 23.0
 text = "Line Antialiasing"
 
-[node name="CheckButton" type="CheckButton" parent="UI/MarginContainer/HBox/VBox/AntiAliasing"]
+[node name="CheckButton" type="CheckButton" parent="UI/MarginContainer/HBox/VBox/AntiAliasing" unique_id=569323296]
 layout_mode = 0
 offset_left = -6.0
 offset_top = 20.0
@@ -178,10 +177,10 @@ focus_mode = 0
 mouse_default_cursor_shape = 16
 button_pressed = true
 
-[node name="Width" type="Control" parent="UI/MarginContainer/HBox/VBox"]
+[node name="Width" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=984546482]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Width"]
+[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Width" unique_id=2050654898]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 2.375
@@ -190,7 +189,7 @@ offset_right = 95.0
 offset_bottom = 23.0
 text = "Line Width"
 
-[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Width"]
+[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Width" unique_id=1904914006]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.4
@@ -206,10 +205,10 @@ min_value = 1.0
 max_value = 10.0
 value = 1.0
 
-[node name="Glow" type="Control" parent="UI/MarginContainer/HBox/VBox"]
+[node name="Glow" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=133757384]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Glow"]
+[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Glow" unique_id=1785172384]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 2.375
@@ -218,7 +217,7 @@ offset_right = 95.0
 offset_bottom = 23.0
 text = "Line Glow"
 
-[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Glow"]
+[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Glow" unique_id=1746482621]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.4
@@ -234,10 +233,10 @@ max_value = 1.0
 step = 0.05
 value = 0.25
 
-[node name="Penalty" type="Control" parent="UI/MarginContainer/HBox/VBox"]
+[node name="Penalty" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=1570665232]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Penalty"]
+[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Penalty" unique_id=928178240]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 2.375
@@ -246,7 +245,7 @@ offset_right = 95.0
 offset_bottom = 23.0
 text = "Line Penalty"
 
-[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Penalty"]
+[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Penalty" unique_id=573996884]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.4
@@ -260,10 +259,10 @@ focus_mode = 0
 mouse_default_cursor_shape = 16
 value = 20.0
 
-[node name="Longevity" type="Control" parent="UI/MarginContainer/HBox/VBox"]
+[node name="Longevity" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=1758362888]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Longevity"]
+[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Longevity" unique_id=1100727722]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 3.2
@@ -272,7 +271,7 @@ offset_right = 128.0
 offset_bottom = 23.0
 text = "Frame Longevity"
 
-[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Longevity"]
+[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Longevity" unique_id=219106689]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.4
@@ -288,17 +287,17 @@ max_value = 1.0
 step = 0.01
 value = 0.5
 
-[node name="Pan" type="Control" parent="UI/MarginContainer/HBox/VBox"]
+[node name="Pan" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=1059408736]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Pan"]
+[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Pan" unique_id=997100967]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.475
 anchor_bottom = 0.575
 text = "Pan"
 
-[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Pan"]
+[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Pan" unique_id=1926006206]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.4
@@ -314,17 +313,17 @@ min_value = -1.0
 max_value = 1.0
 step = 0.1
 
-[node name="Speed" type="Control" parent="UI/MarginContainer/HBox/VBox"]
+[node name="Speed" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=2066775065]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Speed"]
+[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Speed" unique_id=367974755]
 layout_mode = 0
 offset_right = 101.0
 offset_bottom = 48.0
 text = "Speed / Pitch
 "
 
-[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Speed"]
+[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Speed" unique_id=1235202381]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.4
@@ -342,7 +341,7 @@ max_value = 4.0
 step = 0.25
 value = 1.01
 
-[node name="HSlider" type="HSlider" parent="UI/MarginContainer"]
+[node name="HSlider" type="HSlider" parent="UI/MarginContainer" unique_id=1808778296]
 layout_mode = 2
 size_flags_vertical = 8
 focus_mode = 0
