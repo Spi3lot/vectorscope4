@@ -1,13 +1,14 @@
 extends Node2D
 
 const SQRT_8 = sqrt(8)
+var last_frame_time := 0
 var frame_buffer := PackedVector2Array([Vector2.ZERO])
 var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
 var line_whites := PackedColorArray()
 var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
     queue_redraw()
 
 
@@ -18,8 +19,11 @@ func _draw() -> void:
 
     if available < %Vectorscope.frame_buffer_size or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
         return
-
+        
     var previous_frame := frame_buffer[-1]
+    var current_frame_time = Time.get_ticks_msec();
+    Optimizer.FramesPerSecond = 1000.0 / (current_frame_time - last_frame_time)
+    last_frame_time = current_frame_time
     
     frame_buffer = WasapiLoopbackRecorder.GetBuffer(%Vectorscope.frame_buffer_size) \
         if %Vectorscope.loopback \

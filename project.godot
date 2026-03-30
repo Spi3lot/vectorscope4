@@ -8,21 +8,31 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="Vectorscope"
 run/main_scene="uid://dey7wd4sj1xjr"
-config/features=PackedStringArray("4.5", "C#", "Forward Plus")
+config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [audio]
 
+buses/default_bus_layout="uid://b3kfwrvx17gmb"
 driver/enable_input=true
 
 [autoload]
 
 WasapiLoopbackRecorder="*res://scripts/WasapiLoopbackRecorder.cs"
 AudioLoader="*res://scripts/audio_loader.gd"
+Optimizer="*res://scripts/Optimizer.cs"
+
+[debug]
+
+settings/stdout/print_fps=true
 
 [dotnet]
 

@@ -27,6 +27,7 @@ public partial class WasapiLoopbackRecorder : Node
 
         _capture = new WasapiLoopbackCapture();
         _stream.WaveFormat = _capture.WaveFormat;
+        Optimizer.Instance.SampleRate = _stream.WaveFormat.SampleRate;
         _capture.DataAvailable += (_, args) => _stream.Write(args.Buffer, 0, args.BytesRecorded);
         _capture.StartRecording();
     }
