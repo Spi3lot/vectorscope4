@@ -7,7 +7,7 @@ var line_colors := PackedColorArray()
 var line_whites := PackedColorArray()
 var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
     queue_redraw()
 
 
@@ -16,20 +16,23 @@ func _draw() -> void:
         if %Vectorscope.loopback \
         else capture.get_frames_available()
 
-    if available < %Vectorscope.frame_buffer_size or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
+    WasapiLoopbackRecorder.UpdateFps()
+    var frame_buffer_size: int = WasapiLoopbackRecorder.FrameBufferSize
+
+    if available < frame_buffer_size or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
         return
 
     var previous_frame := frame_buffer[-1]
     
-    frame_buffer = WasapiLoopbackRecorder.GetBuffer(%Vectorscope.frame_buffer_size) \
+    frame_buffer = WasapiLoopbackRecorder.GetBuffer(frame_buffer_size) \
         if %Vectorscope.loopback \
-        else capture.get_buffer(%Vectorscope.frame_buffer_size)
+        else capture.get_buffer(frame_buffer_size)
 
-    line_positions.resize(%Vectorscope.frame_buffer_size * 2)
-    line_colors.resize(%Vectorscope.frame_buffer_size)
-    line_whites.resize(%Vectorscope.frame_buffer_size)
+    line_positions.resize(frame_buffer_size * 2)
+    line_colors.resize(frame_buffer_size)
+    line_whites.resize(frame_buffer_size)
 
-    for i in range(%Vectorscope.frame_buffer_size):
+    for i in range(frame_buffer_size):
         var frame := frame_buffer[i]
         line_positions[i * 2] = _get_point_from_frame(previous_frame)
         line_positions[i * 2 + 1] = _get_point_from_frame(frame)
