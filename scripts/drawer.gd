@@ -8,7 +8,6 @@ var line_whites := PackedColorArray()
 var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
 
 func _process(_delta: float) -> void:
-    # TODO update dt here?
     queue_redraw()
 
 
