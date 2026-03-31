@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.IO;
 
 using Godot;
 
@@ -11,7 +10,7 @@ namespace Vectorscope.Scripts;
 public partial class WasapiLoopbackRecorder : Node
 {
 
-    private readonly ConcurrentWaveStream _stream = new(new MemoryStream());
+    private readonly WaveProcessor _waveProcessor = new();
 
     private WasapiLoopbackCapture _capture;
 
@@ -30,7 +29,7 @@ public partial class WasapiLoopbackRecorder : Node
 
     private int FrameBufferSizeUnsafe => Convert.ToInt32(double.Round(FrameBufferSizeRaw, MidpointRounding.ToEven));
 
-    private double FrameBufferSizeRaw => _stream.WaveFormat.SampleRate / Fps;
+    private double FrameBufferSizeRaw => _waveProcessor.WaveFormat.SampleRate / Fps;
 
     public double Fps { get; private set; }
 
@@ -59,18 +58,19 @@ public partial class WasapiLoopbackRecorder : Node
         {
             _capture.Dispose();
             _capture = null;
-            _stream.Clear();
+            _waveProcessor.Pipe.Reset();
             return;
         }
 
+        var pipeWriter = _waveProcessor.Pipe.Writer;
+        _waveProcessor.WaveFormat = _capture.WaveFormat;
         _capture = new WasapiLoopbackCapture();
-        _stream.WaveFormat = _capture.WaveFormat;
-        _capture.DataAvailable += (_, args) => _stream.Write(args.Buffer, 0, args.BytesRecorded);
+        _capture.DataAvailable += async (_, args) => await pipeWriter.WriteAsync(args.Buffer.AsMemory(0, args.BytesRecorded));
         _capture.StartRecording();
     }
 
-    public int GetFramesAvailable() => (int) _stream.GetFramesAvailable();
+    public int GetFramesAvailable() => (int) _waveProcessor.GetFramesAvailable();
 
-    public Vector2[] GetBuffer(int frames) => _stream.ReadStereo(frames, Scale);
+    public Vector2[] GetBuffer(int frames) => _waveProcessor.ReadStereo(frames, Scale);
 
 }
