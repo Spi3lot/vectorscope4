@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.IO;
+using System.Threading;
 
 using Godot;
 
@@ -12,7 +13,7 @@ namespace Vectorscope.Scripts;
 public class ConcurrentWaveStream(MemoryStream stream)
 {
 
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
 
     public MemoryStream BaseStream { get; } = stream;
 
