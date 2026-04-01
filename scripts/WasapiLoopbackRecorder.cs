@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 using Godot;
 
@@ -9,6 +10,8 @@ namespace Vectorscope.Scripts;
 
 public partial class WasapiLoopbackRecorder : Node
 {
+
+    private readonly SemaphoreSlim _writeSemaphore = new(1, 1);
 
     private readonly WaveProcessor _waveProcessor = new();
 
@@ -63,9 +66,23 @@ public partial class WasapiLoopbackRecorder : Node
         }
 
         var pipeWriter = _waveProcessor.Pipe.Writer;
-        _waveProcessor.WaveFormat = _capture.WaveFormat;
         _capture = new WasapiLoopbackCapture();
-        _capture.DataAvailable += async (_, args) => await pipeWriter.WriteAsync(args.Buffer.AsMemory(0, args.BytesRecorded));
+        _waveProcessor.WaveFormat = _capture.WaveFormat;
+
+        _capture.DataAvailable += async (_, args) =>
+        {
+            await _writeSemaphore.WaitAsync();
+
+            try
+            {
+                await pipeWriter.WriteAsync(args.Buffer.AsMemory(0, args.BytesRecorded));
+            }
+            finally
+            {
+                _writeSemaphore.Release();
+            }
+        };
+
         _capture.StartRecording();
     }
 
