@@ -50,7 +50,7 @@ public class WaveProcessor
     private Vector2 ReadStereo(ref SequenceReader<byte> reader)
     {
         float x = ReadSingleLittleEndian(ref reader);
-        int usedChannels = int.Max(WaveFormat.Channels, 2);
+        int usedChannels = int.Min(WaveFormat.Channels, 2);
 
         float y = usedChannels switch
         {
