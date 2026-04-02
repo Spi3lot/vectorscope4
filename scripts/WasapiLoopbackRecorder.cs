@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 using Godot;
@@ -21,53 +22,64 @@ public partial class WasapiLoopbackRecorder : Node
 
     public float Scale { get; set; } = 1;
 
-    public int FrameBufferSize
+    public int OptimalFrameBufferSize(double sampleRate = double.NaN)
     {
-        get
+        if (double.IsNaN(sampleRate))
         {
-            int size = FrameBufferSizeUnsafe;
-            return size + size % 2; // Returning the bigger even number to ensure we are not lagging behind.
+            sampleRate = _waveProcessor.WaveFormat.SampleRate;
         }
+
+        int size = Mathf.RoundToInt(sampleRate / Fps);
+        return size + size % 2; // Returning the bigger even number to ensure we are not lagging behind.
     }
 
-    private int FrameBufferSizeUnsafe => Convert.ToInt32(double.Round(FrameBufferSizeRaw, MidpointRounding.ToEven));
-
-    private double FrameBufferSizeRaw => _waveProcessor.WaveFormat.SampleRate / Fps;
-
-    public double Fps { get; private set; }
+    public double Fps { get; private set; } = 60;
 
     public void UpdateFps()
     {
-        if (_lastUpdateFpsTimestamp != 0)
-        {
-            Fps = 1 / Stopwatch.GetElapsedTime(_lastUpdateFpsTimestamp).TotalSeconds;
-        }
-        else if (Engine.MaxFps > 0)
-        {
-            Fps = Engine.MaxFps;
-        }
-        else
-        {
-            float refreshRate = DisplayServer.ScreenGetRefreshRate();
-            Fps = (refreshRate > 0) ? refreshRate : double.PositiveInfinity;
-        }
-
+        Fps = CalculateFps();
         _lastUpdateFpsTimestamp = Stopwatch.GetTimestamp();
     }
 
-    public void SetRecording(bool value)
+    private double CalculateFps()
     {
-        if (!value)
+        if (_lastUpdateFpsTimestamp != 0)
         {
-            _capture.Dispose();
-            _capture = null;
-            _waveProcessor.Pipe.Reset();
-            return;
+            return 1 / Stopwatch.GetElapsedTime(_lastUpdateFpsTimestamp).TotalSeconds;
         }
 
-        var pipeWriter = _waveProcessor.Pipe.Writer;
-        _capture = new WasapiLoopbackCapture();
-        _waveProcessor.WaveFormat = _capture.WaveFormat;
+        if (Engine.MaxFps > 0)
+        {
+            return Engine.MaxFps;
+        }
+
+        float refreshRate = DisplayServer.ScreenGetRefreshRate();
+        return (refreshRate <= 0) ? Fps : refreshRate;
+    }
+
+    public Error SetRecording(bool value)
+    {
+        try
+        {
+            return (value) ? StartRecording() : StopRecording();
+        }
+        catch (Exception ex)
+        {
+            GD.PushError(ex.ToString());
+            return Error.Failed;
+        }
+    }
+
+    private Error StartRecording()
+    {
+        try
+        {
+            _capture = new WasapiLoopbackCapture();
+        }
+        catch (COMException ex) when (ex.HResult == unchecked((int) 0x80070490)) // E_ELEMENT_NOT_FOUND
+        {
+            return Error.CantOpen;
+        }
 
         _capture.DataAvailable += async (_, args) =>
         {
@@ -75,7 +87,7 @@ public partial class WasapiLoopbackRecorder : Node
 
             try
             {
-                await pipeWriter.WriteAsync(args.Buffer.AsMemory(0, args.BytesRecorded));
+                await _waveProcessor.Pipe.Writer.WriteAsync(args.Buffer.AsMemory(0, args.BytesRecorded));
             }
             finally
             {
@@ -83,7 +95,19 @@ public partial class WasapiLoopbackRecorder : Node
             }
         };
 
+        _waveProcessor.WaveFormat = _capture.WaveFormat;
         _capture.StartRecording();
+        return Error.Ok;
+    }
+
+    private Error StopRecording()
+    {
+        _capture.Dispose();
+        _capture = null;
+        _waveProcessor.Pipe.Writer.Complete();
+        _waveProcessor.Pipe.Reader.Complete();
+        _waveProcessor.Pipe.Reset();
+        return Error.Ok;
     }
 
     public int GetFramesAvailable() => (int) _waveProcessor.GetFramesAvailable();
