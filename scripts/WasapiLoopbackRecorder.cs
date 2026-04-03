@@ -18,40 +18,40 @@ public partial class WasapiLoopbackRecorder : Node
 
     private WasapiLoopbackCapture _capture;
 
-    private long _lastUpdateFpsTimestamp;
+    private long _lastUpdateDtTimestamp;
 
     public float Scale { get; set; } = 1;
 
     public double SampleRate => _waveProcessor.WaveFormat.SampleRate;
 
-    public double Fps { get; private set; } = 60;
+    public double DeltaTime { get; private set; } = 1.0 / 60.0;
 
     public int OptimalFrameBufferSize(double sampleRate)
     {
-        int size = Mathf.RoundToInt(sampleRate / Fps);
-        return size + size % 2; // Returning the bigger even number to ensure we are not lagging behind.
+        int size = Mathf.RoundToInt(sampleRate * DeltaTime);
+        return size + size % 2; // Returning the bigger even number to reduce latency, at least on odd sizes.
     }
 
-    public void UpdateFps()
+    public void UpdateDeltaTime()
     {
-        Fps = CalculateFps();
-        _lastUpdateFpsTimestamp = Stopwatch.GetTimestamp();
+        DeltaTime = 1 / CalculateDeltaTime();
+        _lastUpdateDtTimestamp = Stopwatch.GetTimestamp();
     }
 
-    private double CalculateFps()
+    private double CalculateDeltaTime()
     {
-        if (_lastUpdateFpsTimestamp != 0)
+        if (_lastUpdateDtTimestamp != 0)
         {
-            return 1 / Stopwatch.GetElapsedTime(_lastUpdateFpsTimestamp).TotalSeconds;
+            return Stopwatch.GetElapsedTime(_lastUpdateDtTimestamp).TotalSeconds;
         }
 
         if (Engine.MaxFps > 0)
         {
-            return Engine.MaxFps;
+            return 1.0 / Engine.MaxFps;
         }
 
         float refreshRate = DisplayServer.ScreenGetRefreshRate();
-        return (refreshRate <= 0) ? Fps : refreshRate;
+        return (refreshRate <= 0) ? DeltaTime : 1.0 / refreshRate;
     }
 
     public Error SetRecording(bool value)

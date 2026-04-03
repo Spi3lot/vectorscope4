@@ -12,27 +12,36 @@ func _process(_delta: float) -> void:
 
 
 func _draw() -> void:
-    # TODO: Remove
-    if Engine.get_frames_drawn() % 60 == 0:
-        print(WasapiLoopbackRecorder.Fps)
-        print(Engine.get_frames_per_second())
-        print(DisplayServer.screen_get_refresh_rate())
-        print()
-
+    # Updating the fps no matter if we're actually drawing anything or not.
+    # This ensures we capture how fast we COULD draw, which is exactly what
+    # we want here. This means that if we're rendering many frames without
+    # actually drawing anything, the optimal frame buffer size should drop.
+    # Slowly but steadily we should be approaching the perfect combination 
+    # of frame rate and buffer size.
+    WasapiLoopbackRecorder.UpdateDeltaTime()
+    
     var sample_rate: float = WasapiLoopbackRecorder.SampleRate \
         if %Vectorscope.loopback \
         else AudioServer.get_mix_rate()
 
     var frame_buffer_size: int = WasapiLoopbackRecorder.OptimalFrameBufferSize(sample_rate)
 
-    if not %Vectorscope.loopback and (capture.get_frames_available() < frame_buffer_size or %Vectorscope.audio_player.stream_paused):
+    # TODO: Remove
+    if Engine.get_frames_drawn() % 60 == 0:
+        print(frame_buffer_size)
+        print(1 / WasapiLoopbackRecorder.DeltaTime)
+        print(WasapiLoopbackRecorder.DeltaTime)
+        print(Engine.get_frames_per_second())
+        print(DisplayServer.screen_get_refresh_rate())
+        print()
+
+    if not %Vectorscope.loopback and (%Vectorscope.audio_player.stream_paused or capture.get_frames_available() < frame_buffer_size):
         return
 
     var previous_frame := Vector2.ZERO \
         if frame_buffer.is_empty() \
         else frame_buffer[-1]
 
-    # TODO: fix non-loopback
     frame_buffer = WasapiLoopbackRecorder.GetBuffer(frame_buffer_size) \
         if %Vectorscope.loopback \
         else capture.get_buffer(frame_buffer_size)
@@ -40,7 +49,6 @@ func _draw() -> void:
     if frame_buffer.is_empty():
         return
 
-    WasapiLoopbackRecorder.UpdateFps()
     line_positions.resize(frame_buffer_size * 2)
     line_colors.resize(frame_buffer_size)
     line_whites.resize(frame_buffer_size)
@@ -55,10 +63,10 @@ func _draw() -> void:
         
     var sub_viewport: VectorscopeSubViewport = %Vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
-    var exponent: float = 1000 * frame_buffer_size / (sample_rate * WasapiLoopbackRecorder.Fps)
+    var exponent: float = 1000 * WasapiLoopbackRecorder.DeltaTime * frame_buffer_size / sample_rate
     var alpha: float = 1 - %Vectorscope.persistence ** exponent
     sub_viewport.drawer.draw_rect(rect, Color(Color.BLACK, alpha), true)
-    
+
     # We have to use multiline instead of polyline because
     # multiline uses segment-by-segment coloring, while
     # polyline uses point-by-point coloring
