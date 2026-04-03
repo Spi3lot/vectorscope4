@@ -17,20 +17,26 @@ public class WaveProcessor
     public WaveFormat WaveFormat { get; set; }
 
     /// <summary>
-    /// Reads and returns the requested amount of stereo audio frames
+    /// Reads and returns the requested amount of stereo audio frames as <code>Vector2</code>
     /// </summary>
     /// <param name="requestedFrameCount">
-    ///     This parameter exists to ...
-    ///     1. ... set a maximum to the amount of lines that are drawn per frame
-    ///        in order to leave enough data for the next frame to draw so that the framerate
-    ///        does not artificially drop. This process can be thought of as "spreading across multiple frames"
+    ///     This parameter acts as ...
+    ///     1. ... an upper limit to the amount of lines that are drawn per frame
+    ///        in order to leave enough data for the next frame to visualize
+    ///        so that the framerate does not drop unnecessarily.
+    ///        This process can be thought of as "spreading across multiple frames"
     ///        or "inter-frame spreading" if you like.
-    ///     2. ... set a minimum to the amount of lines that are drawn per frame
-    ///        in order to retain clear visual feedback which would be lost when
-    ///        not drawing enough lines in a single frame.
+    ///     2. ... a lower limit to the amount of lines that are drawn per frame
+    ///        to make the program wait for more data to arrive
+    ///        in order to not leave too much for the upcoming frames,
+    ///        which otherwise could make them struggle with keeping
+    ///        up a high and somewhat constant framerate.
     /// </param>
     /// <param name="scale">The factor to multiply each frame by</param>
-    /// <returns></returns>
+    /// <returns>
+    ///     A <code>Vector2[]</code> containing the requested amount of stereo audio frames
+    ///     or nothing if there is not enough data available yet. 
+    /// </returns>
     public Vector2[] ReadStereo(int requestedFrameCount, float scale = 1)
     {
         if (!Pipe.Reader.TryRead(out var result))
