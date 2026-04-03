@@ -16,38 +16,47 @@ public class WaveProcessor
 
     public WaveFormat WaveFormat { get; set; }
 
-    public long GetFramesAvailable()
-    {
-        if (!Pipe.Reader.TryRead(out var result))
-        {
-            return 0;
-        }
-
-        long frameCount = result.Buffer.Length / WaveFormat.BlockAlign;
-        Pipe.Reader.AdvanceTo(result.Buffer.Start);
-        return frameCount;
-    }
-
-    public Vector2[] ReadStereo(int frames, float scale = 1)
+    /// <summary>
+    /// Reads and returns the requested amount of stereo audio frames
+    /// </summary>
+    /// <param name="requestedFrameCount">
+    ///     This parameter exists to ...
+    ///     1. ... set a maximum to the amount of lines that are drawn per frame
+    ///        in order to leave enough data for the next frame to draw so that the framerate
+    ///        does not artificially drop. This process can be thought of as "spreading across multiple frames"
+    ///        or "inter-frame spreading" if you like.
+    ///     2. ... set a minimum to the amount of lines that are drawn per frame
+    ///        in order to retain clear visual feedback which would be lost when
+    ///        not drawing enough lines in a single frame.
+    /// </param>
+    /// <param name="scale">The factor to multiply each frame by</param>
+    /// <returns></returns>
+    public Vector2[] ReadStereo(int requestedFrameCount, float scale = 1)
     {
         if (!Pipe.Reader.TryRead(out var result))
         {
             return [];
         }
 
-        var reader = new SequenceReader<byte>(result.Buffer);
-        var vectors = new Vector2[frames];
-
-        for (int i = 0; i < frames; i++)
+        if (result.Buffer.Length < requestedFrameCount * WaveFormat.BlockAlign)
         {
-            vectors[i] = scale * ReadStereo(ref reader);
+            Pipe.Reader.AdvanceTo(result.Buffer.Start, result.Buffer.End);
+            return [];
         }
 
-        Pipe.Reader.AdvanceTo(result.Buffer.End);
+        var reader = new SequenceReader<byte>(result.Buffer);
+        var vectors = new Vector2[requestedFrameCount];
+
+        for (int i = 0; i < requestedFrameCount; i++)
+        {
+            vectors[i] = scale * ReadStereoFrame(ref reader);
+        }
+
+        Pipe.Reader.AdvanceTo(reader.Position, reader.Position);
         return vectors;
     }
 
-    private Vector2 ReadStereo(ref SequenceReader<byte> reader)
+    private Vector2 ReadStereoFrame(ref SequenceReader<byte> reader)
     {
         float x = ReadSingleLittleEndian(ref reader);
         int usedChannels = int.Min(WaveFormat.Channels, 2);

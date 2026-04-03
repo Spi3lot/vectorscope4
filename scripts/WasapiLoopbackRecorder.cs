@@ -22,18 +22,15 @@ public partial class WasapiLoopbackRecorder : Node
 
     public float Scale { get; set; } = 1;
 
-    public int OptimalFrameBufferSize(double sampleRate = double.NaN)
-    {
-        if (double.IsNaN(sampleRate))
-        {
-            sampleRate = _waveProcessor.WaveFormat.SampleRate;
-        }
+    public double SampleRate => _waveProcessor.WaveFormat.SampleRate;
 
+    public double Fps { get; private set; } = 60;
+
+    public int OptimalFrameBufferSize(double sampleRate)
+    {
         int size = Mathf.RoundToInt(sampleRate / Fps);
         return size + size % 2; // Returning the bigger even number to ensure we are not lagging behind.
     }
-
-    public double Fps { get; private set; } = 60;
 
     public void UpdateFps()
     {
@@ -109,8 +106,6 @@ public partial class WasapiLoopbackRecorder : Node
         _waveProcessor.Pipe.Reset();
         return Error.Ok;
     }
-
-    public int GetFramesAvailable() => (int) _waveProcessor.GetFramesAvailable();
 
     public Vector2[] GetBuffer(int frames) => _waveProcessor.ReadStereo(frames, Scale);
 

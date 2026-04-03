@@ -19,29 +19,28 @@ func _draw() -> void:
         print(DisplayServer.screen_get_refresh_rate())
         print()
 
-    var frame_buffer_size: int
-    var available: int
+    var sample_rate: float = WasapiLoopbackRecorder.SampleRate \
+        if %Vectorscope.loopback \
+        else AudioServer.get_mix_rate()
 
-    if %Vectorscope.loopback:
-        frame_buffer_size = WasapiLoopbackRecorder.OptimalFrameBufferSize(AudioServer.get_mix_rate())
-        available = WasapiLoopbackRecorder.GetFramesAvailable()
-    else:
-        frame_buffer_size = WasapiLoopbackRecorder.OptimalFrameBufferSize()
-        available = capture.get_frames_available()
+    var frame_buffer_size: int = WasapiLoopbackRecorder.OptimalFrameBufferSize(sample_rate)
 
-    if available < frame_buffer_size or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
+    if not %Vectorscope.loopback and (capture.get_frames_available() < frame_buffer_size or %Vectorscope.audio_player.stream_paused):
         return
-
-    WasapiLoopbackRecorder.UpdateFps()
 
     var previous_frame := Vector2.ZERO \
         if frame_buffer.is_empty() \
         else frame_buffer[-1]
 
+    # TODO: fix non-loopback
     frame_buffer = WasapiLoopbackRecorder.GetBuffer(frame_buffer_size) \
         if %Vectorscope.loopback \
         else capture.get_buffer(frame_buffer_size)
 
+    if frame_buffer.is_empty():
+        return
+
+    WasapiLoopbackRecorder.UpdateFps()
     line_positions.resize(frame_buffer_size * 2)
     line_colors.resize(frame_buffer_size)
     line_whites.resize(frame_buffer_size)
@@ -56,8 +55,9 @@ func _draw() -> void:
         
     var sub_viewport: VectorscopeSubViewport = %Vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
-    var exponent: float = frame_buffer_size / WasapiLoopbackRecorder.Fps
-    sub_viewport.drawer.draw_rect(rect, Color(Color.BLACK, 1 - %Vectorscope.persistence ** exponent), true)
+    var exponent: float = 1000 * frame_buffer_size / (sample_rate * WasapiLoopbackRecorder.Fps)
+    var alpha: float = 1 - %Vectorscope.persistence ** exponent
+    sub_viewport.drawer.draw_rect(rect, Color(Color.BLACK, alpha), true)
     
     # We have to use multiline instead of polyline because
     # multiline uses segment-by-segment coloring, while
