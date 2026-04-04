@@ -37,6 +37,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_uuccd")
+persistence = 0.3
 audio_player = NodePath("AudioStreamPlayer")
 sub_viewport_container = NodePath("VectorscopeSubViewportContainer")
 metadata/_edit_lock_ = true
