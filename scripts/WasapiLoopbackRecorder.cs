@@ -12,6 +12,8 @@ namespace Vectorscope.Scripts;
 public partial class WasapiLoopbackRecorder : Node
 {
 
+    private const double DefaultFps = 60;
+
     private readonly SemaphoreSlim _writeSemaphore = new(1, 1);
 
     private readonly WaveProcessor _waveProcessor = new();
@@ -24,34 +26,36 @@ public partial class WasapiLoopbackRecorder : Node
 
     public double SampleRate => _waveProcessor.WaveFormat.SampleRate;
 
-    public double DeltaTime { get; private set; } = 1.0 / 60.0;
+    public double DeltaTime { get; private set; } = 1 / DefaultFps;
 
     public int OptimalFrameBufferSize(double sampleRate)
     {
         int size = Mathf.RoundToInt(sampleRate * DeltaTime);
-        return size + size % 2; // Returning the bigger even number to reduce latency, at least on odd sizes.
+        return 1024; // Returning the bigger even number to reduce latency, at least on odd sizes.
     }
 
     public void UpdateDeltaTime()
     {
-        DeltaTime = 1 / CalculateDeltaTime();
+        DeltaTime = CalculateDeltaTime();
         _lastUpdateDtTimestamp = Stopwatch.GetTimestamp();
     }
 
     private double CalculateDeltaTime()
     {
-        if (_lastUpdateDtTimestamp != 0)
-        {
-            return Stopwatch.GetElapsedTime(_lastUpdateDtTimestamp).TotalSeconds;
-        }
+        return (_lastUpdateDtTimestamp != 0)
+            ? Stopwatch.GetElapsedTime(_lastUpdateDtTimestamp).TotalSeconds
+            : 1 / GetMaxFps();
+    }
 
+    private static double GetMaxFps()
+    {
         if (Engine.MaxFps > 0)
         {
-            return 1.0 / Engine.MaxFps;
+            return Engine.MaxFps;
         }
 
         float refreshRate = DisplayServer.ScreenGetRefreshRate();
-        return (refreshRate <= 0) ? DeltaTime : 1.0 / refreshRate;
+        return (refreshRate <= 0) ? DefaultFps : refreshRate;
     }
 
     public Error SetRecording(bool value)

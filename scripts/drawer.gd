@@ -8,16 +8,17 @@ var line_whites := PackedColorArray()
 var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
 
 func _process(_delta: float) -> void:
+    # TODO update dt here?
     queue_redraw()
 
 
 func _draw() -> void:
-    # Updating the fps no matter if we're actually drawing anything or not.
-    # This ensures we capture how fast we COULD draw, which is exactly what
-    # we want here. This means that if we're rendering many frames without
-    # actually drawing anything, the optimal frame buffer size should drop.
-    # Slowly but steadily we should be approaching the perfect combination 
-    # of frame rate and buffer size.
+    # Updating delta time regardless of whether we're actually going to draw
+    # anything or not. This ensures we capture how fast we COULD draw, which
+    # is exactly what we want here. This means that if we're rendering many
+    # frames without actually drawing anything, the optimal frame buffer
+    # size should drop. Slowly but steadily we should be approaching the
+    # perfect combination of frame rate and buffer size.
     WasapiLoopbackRecorder.UpdateDeltaTime()
     
     var sample_rate: float = WasapiLoopbackRecorder.SampleRate \
@@ -63,7 +64,9 @@ func _draw() -> void:
         
     var sub_viewport: VectorscopeSubViewport = %Vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
-    var exponent: float = 1000 * WasapiLoopbackRecorder.DeltaTime * frame_buffer_size / sample_rate
+    var dt: float = WasapiLoopbackRecorder.DeltaTime
+    var time_multiplier = 1 if %Vectorscope.loopback else %Vectorscope.audio_player.pitch_scale
+    var exponent: float = 1000 * dt * time_multiplier * frame_buffer_size / sample_rate
     var alpha: float = 1 - %Vectorscope.persistence ** exponent
     sub_viewport.drawer.draw_rect(rect, Color(Color.BLACK, alpha), true)
 
@@ -96,5 +99,5 @@ func _calc_color(previous_frame: Vector2, current_frame: Vector2) -> Color:
     var distance := previous_frame.distance_to(current_frame)
     var normalized_distance: float = distance / (%Vectorscope.plot_scale * SQRT_8)
     var color := Color(%Vectorscope.line_color)
-    color.a = maxf(0, 1 - normalized_distance * %Vectorscope.length_penalty)
+    color.a = maxf(0, 1 - normalized_distance * %Vectorscope.length_penalty) # TODO: take time_multiplier into account
     return color
