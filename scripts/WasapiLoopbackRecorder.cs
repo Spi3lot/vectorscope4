@@ -101,7 +101,7 @@ public partial class WasapiLoopbackRecorder : Node
             }
             catch (OperationCanceledException)
             {
-                // Recording stopped (probably turned off loopback mode)
+                // Recording stopped (probably because loopback mode was turned off)
             }
             finally
             {
