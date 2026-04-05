@@ -38,8 +38,6 @@ func _draw() -> void:
         if %Vectorscope.loopback \
         else capture.get_buffer(frame_buffer_size)
 
-    # TODO: fix empty frame buffer for a few seconds after turning on loopback.
-    # Not necessarily empty but sometimes ranges from only 16 to 18 frames
     if frame_buffer.is_empty():
         return
 
@@ -57,7 +55,7 @@ func _draw() -> void:
         
     var sub_viewport: VectorscopeSubViewport = %Vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
-    var dt: float = WasapiLoopbackRecorder.DeltaTime # TODO: sometimes really low like 0.0003 when the above TODO applies
+    var dt: float = WasapiLoopbackRecorder.DeltaTime
     var time_multiplier = 1 if %Vectorscope.loopback else %Vectorscope.audio_player.pitch_scale
     var exponent: float = 1000 * dt * time_multiplier * frame_buffer_size / sample_rate
     var alpha: float = 1 - %Vectorscope.persistence ** exponent

@@ -78,17 +78,37 @@ public partial class WasapiLoopbackRecorder : Node
             return Error.CantOpen;
         }
 
+        var cts = new CancellationTokenSource();
+
+        _capture.RecordingStopped += async (_, _) =>
+        {
+            await cts.CancelAsync();
+            cts.Dispose();
+        };
+
         _capture.DataAvailable += async (_, args) =>
         {
-            await _writeSemaphore.WaitAsync();
+            bool semaphoreAcquired = false;
 
             try
             {
-                await _waveProcessor.Pipe.Writer.WriteAsync(args.Buffer.AsMemory(0, args.BytesRecorded));
+                await _writeSemaphore.WaitAsync(cts.Token);
+                semaphoreAcquired = true;
+ 
+                await _waveProcessor.Pipe.Writer.WriteAsync(
+                    args.Buffer.AsMemory(0, args.BytesRecorded),
+                    cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                // Recording stopped (probably turned off loopback mode)
             }
             finally
             {
-                _writeSemaphore.Release();
+                if (semaphoreAcquired)
+                {
+                    _writeSemaphore.Release();
+                }
             }
         };
 
