@@ -23,7 +23,7 @@ func _draw() -> void:
     
     var sample_rate: float = WasapiLoopbackRecorder.SampleRate \
         if %Vectorscope.loopback \
-        else AudioServer.get_mix_rate() * %Vectorscope.audio_player.pitch_scale # TODO: check if '* %Vectorscope.audio_player.pitch_scale' makes sense
+        else AudioServer.get_mix_rate()
 
     var frame_buffer_size: int = WasapiLoopbackRecorder.OptimalFrameBufferSize(sample_rate)
 
