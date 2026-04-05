@@ -28,11 +28,7 @@ public partial class WasapiLoopbackRecorder : Node
 
     public double DeltaTime { get; private set; } = 1 / DefaultFps;
 
-    public int OptimalFrameBufferSize(double sampleRate)
-    {
-        int size = Mathf.RoundToInt(sampleRate * DeltaTime);
-        return 1024; // Returning the bigger even number to reduce latency, at least on odd sizes.
-    }
+    public int OptimalFrameBufferSize(double sampleRate) => Mathf.RoundToInt(sampleRate * DeltaTime);
 
     public void UpdateDeltaTime()
     {
@@ -103,7 +99,7 @@ public partial class WasapiLoopbackRecorder : Node
 
     private Error StopRecording()
     {
-        _capture.Dispose();
+        _capture?.Dispose();
         _capture = null;
         _waveProcessor.Pipe.Writer.Complete();
         _waveProcessor.Pipe.Reader.Complete();

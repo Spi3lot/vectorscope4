@@ -58,7 +58,7 @@ public class WaveProcessor
             vectors[i] = scale * ReadStereoFrame(ref reader);
         }
 
-        Pipe.Reader.AdvanceTo(reader.Position, reader.Position);
+        Pipe.Reader.AdvanceTo(reader.Position);
         return vectors;
     }
 
