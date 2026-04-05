@@ -3,7 +3,7 @@ extends Control
 @export var volume_label: Label
 @export var volume_slider: VSlider
 @export var loopback_button: CheckButton
-@export var longevity_slider: HSlider
+@export var persistence_slider: HSlider
 @export var penalty_slider: HSlider
 @export var pan_control: Control
 @export var speed_control: Control
@@ -13,6 +13,8 @@ var dragging := false
 
 func _ready() -> void:
     loopback_button.button_pressed = %Vectorscope.loopback
+    persistence_slider.value = %Vectorscope.persistence
+    penalty_slider.value = %Vectorscope.length_penalty
     get_tree().root.mouse_entered.connect(func(): visible = true)
     get_tree().root.mouse_exited.connect(func(): visible = false)
 
@@ -49,8 +51,8 @@ func _on_antialiasing_toggled(toggled_on: bool) -> void:
     %Vectorscope.line_antialiasing = toggled_on
 
 
-func _on_longevity_value_changed(value: float) -> void:
-    %Vectorscope.fade_color.a = 1 - value
+func _on_persistence_value_changed(value: float) -> void:
+    %Vectorscope.persistence = value
 
 
 func _on_pan_value_changed(value: float) -> void:
@@ -74,7 +76,19 @@ func _on_seek_drag_ended(value_changed: bool) -> void:
 
 
 func _on_loopback_toggled(toggled_on: bool) -> void:
-    WasapiLoopbackRecorder.SetRecording(toggled_on)
+    var error: Error = WasapiLoopbackRecorder.SetRecording(toggled_on)
+    var label: Label = loopback_button.get_parent().get_node('ErrorLabel')
+    label.text = ""
+
+    if error != OK:
+        if error == ERR_CANT_OPEN:
+            label.text = "Can't open any audio output device for loopback"
+        else:
+            label.text = "An error occurred"
+
+        toggled_on = not toggled_on
+        loopback_button.set_pressed_no_signal(toggled_on)
+
     pan_control.visible = not toggled_on
     speed_control.visible = not toggled_on
     seek_slider.visible = not toggled_on

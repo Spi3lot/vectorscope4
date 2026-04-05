@@ -37,6 +37,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_uuccd")
+persistence = 0.3
 audio_player = NodePath("AudioStreamPlayer")
 sub_viewport_container = NodePath("VectorscopeSubViewportContainer")
 metadata/_edit_lock_ = true
@@ -68,7 +69,7 @@ script = ExtResource("4_tbgi4")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=499037899]
 
-[node name="MarginContainer" type="MarginContainer" parent="UI" unique_id=25295232 node_paths=PackedStringArray("volume_label", "volume_slider", "loopback_button", "longevity_slider", "penalty_slider", "pan_control", "speed_control", "seek_slider")]
+[node name="MarginContainer" type="MarginContainer" parent="UI" unique_id=25295232 node_paths=PackedStringArray("volume_label", "volume_slider", "loopback_button", "persistence_slider", "penalty_slider", "pan_control", "speed_control", "seek_slider")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -82,7 +83,7 @@ script = ExtResource("3_lpaer")
 volume_label = NodePath("HBox/Volume/Label")
 volume_slider = NodePath("HBox/Volume/VSlider")
 loopback_button = NodePath("HBox/VBox/Loopback/CheckButton")
-longevity_slider = NodePath("HBox/VBox/Longevity/HSlider")
+persistence_slider = NodePath("HBox/VBox/Persistence/HSlider")
 penalty_slider = NodePath("HBox/VBox/Penalty/HSlider")
 pan_control = NodePath("HBox/VBox/Pan")
 speed_control = NodePath("HBox/VBox/Speed")
@@ -156,6 +157,16 @@ offset_bottom = 44.0
 tooltip_text = "Whether to capture all currently replayed audio or play a specific audio file"
 focus_mode = 0
 mouse_default_cursor_shape = 16
+
+[node name="ErrorLabel" type="Label" parent="UI/MarginContainer/HBox/VBox/Loopback" unique_id=396121547]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 36.0
+offset_top = 22.0
+offset_right = 111.0
+offset_bottom = 45.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+text = "Error"
 
 [node name="AntiAliasing" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=1071967015]
 layout_mode = 2
@@ -259,19 +270,19 @@ focus_mode = 0
 mouse_default_cursor_shape = 16
 value = 20.0
 
-[node name="Longevity" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=1758362888]
+[node name="Persistence" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=1758362888]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Longevity" unique_id=1100727722]
+[node name="Label" type="Label" parent="UI/MarginContainer/HBox/VBox/Persistence" unique_id=1100727722]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 3.2
 anchor_bottom = 0.575
 offset_right = 128.0
 offset_bottom = 23.0
-text = "Frame Longevity"
+text = "Persistence"
 
-[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Longevity" unique_id=219106689]
+[node name="HSlider" type="HSlider" parent="UI/MarginContainer/HBox/VBox/Persistence" unique_id=219106689]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.4
@@ -338,8 +349,8 @@ focus_mode = 0
 mouse_default_cursor_shape = 16
 min_value = 0.01
 max_value = 4.0
-step = 0.25
-value = 1.01
+step = 0.248
+value = 1.002
 
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer" unique_id=1808778296]
 layout_mode = 2
@@ -356,7 +367,7 @@ scrollable = false
 [connection signal="value_changed" from="UI/MarginContainer/HBox/VBox/Width/HSlider" to="UI/MarginContainer" method="_on_width_value_changed"]
 [connection signal="value_changed" from="UI/MarginContainer/HBox/VBox/Glow/HSlider" to="UI/MarginContainer" method="_on_glow_value_changed"]
 [connection signal="value_changed" from="UI/MarginContainer/HBox/VBox/Penalty/HSlider" to="UI/MarginContainer" method="_on_penalty_value_changed"]
-[connection signal="value_changed" from="UI/MarginContainer/HBox/VBox/Longevity/HSlider" to="UI/MarginContainer" method="_on_longevity_value_changed"]
+[connection signal="value_changed" from="UI/MarginContainer/HBox/VBox/Persistence/HSlider" to="UI/MarginContainer" method="_on_persistence_value_changed"]
 [connection signal="value_changed" from="UI/MarginContainer/HBox/VBox/Pan/HSlider" to="UI/MarginContainer" method="_on_pan_value_changed"]
 [connection signal="value_changed" from="UI/MarginContainer/HBox/VBox/Speed/HSlider" to="UI/MarginContainer" method="_on_speed_value_changed"]
 [connection signal="drag_ended" from="UI/MarginContainer/HSlider" to="UI/MarginContainer" method="_on_seek_drag_ended"]

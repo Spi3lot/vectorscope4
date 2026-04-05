@@ -26,8 +26,8 @@ driver/enable_input=true
 
 [autoload]
 
-WasapiLoopbackRecorder="*res://scripts/WasapiLoopbackRecorder.cs"
-AudioLoader="*res://scripts/audio_loader.gd"
+WasapiLoopbackRecorder="*uid://cw40ih6vhgu6c"
+AudioLoader="*uid://ba454av62hfhb"
 
 [debug]
 

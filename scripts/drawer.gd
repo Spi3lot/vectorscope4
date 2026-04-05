@@ -1,32 +1,45 @@
 extends Node2D
 
-const SQRT_8 = sqrt(8)
-var frame_buffer := PackedVector2Array([Vector2.ZERO])
+const SQRT_8 := sqrt(8)
+var frame_buffer := PackedVector2Array()
 var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
 var line_whites := PackedColorArray()
 var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
 
 func _process(_delta: float) -> void:
+    # TODO update dt here?
     queue_redraw()
 
 
 func _draw() -> void:
-    var available: int = WasapiLoopbackRecorder.GetFramesAvailable() \
+    # Updating delta time regardless of whether we're actually going to draw
+    # anything or not. This ensures we capture how fast we COULD draw, which
+    # is exactly what we want here. This means that if we're rendering many
+    # frames without actually drawing anything, the optimal frame buffer
+    # size should drop. Slowly but steadily we should be approaching the
+    # perfect combination of frame rate and buffer size.
+    WasapiLoopbackRecorder.UpdateDeltaTime()
+    
+    var sample_rate: float = WasapiLoopbackRecorder.SampleRate \
         if %Vectorscope.loopback \
-        else capture.get_frames_available()
+        else AudioServer.get_mix_rate()
 
-    WasapiLoopbackRecorder.UpdateFps()
-    var frame_buffer_size: int = WasapiLoopbackRecorder.FrameBufferSize
+    var frame_buffer_size: int = WasapiLoopbackRecorder.OptimalFrameBufferSize(sample_rate)
 
-    if available < frame_buffer_size or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
+    if not %Vectorscope.loopback and (%Vectorscope.audio_player.stream_paused or capture.get_frames_available() < frame_buffer_size):
         return
 
-    var previous_frame := frame_buffer[-1]
-    
+    var previous_frame := Vector2.ZERO \
+        if frame_buffer.is_empty() \
+        else frame_buffer[-1]
+
     frame_buffer = WasapiLoopbackRecorder.GetBuffer(frame_buffer_size) \
         if %Vectorscope.loopback \
         else capture.get_buffer(frame_buffer_size)
+
+    if frame_buffer.is_empty():
+        return
 
     line_positions.resize(frame_buffer_size * 2)
     line_colors.resize(frame_buffer_size)
@@ -42,8 +55,12 @@ func _draw() -> void:
         
     var sub_viewport: VectorscopeSubViewport = %Vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
-    sub_viewport.drawer.draw_rect(rect, %Vectorscope.fade_color, true)
-    
+    var dt: float = WasapiLoopbackRecorder.DeltaTime
+    var time_multiplier = 1 if %Vectorscope.loopback else %Vectorscope.audio_player.pitch_scale
+    var exponent: float = 1000 * dt * time_multiplier * frame_buffer_size / sample_rate
+    var alpha: float = 1 - %Vectorscope.persistence ** exponent
+    sub_viewport.drawer.draw_rect(rect, Color(Color.BLACK, alpha), true)
+
     # We have to use multiline instead of polyline because
     # multiline uses segment-by-segment coloring, while
     # polyline uses point-by-point coloring
@@ -72,6 +89,7 @@ func _get_point_from_frame(frame: Vector2) -> Vector2:
 func _calc_color(previous_frame: Vector2, current_frame: Vector2) -> Color:
     var distance := previous_frame.distance_to(current_frame)
     var normalized_distance: float = distance / (%Vectorscope.plot_scale * SQRT_8)
+    var penalty: float = %Vectorscope.length_penalty / sqrt(%Vectorscope.audio_player.pitch_scale)
     var color := Color(%Vectorscope.line_color)
-    color.a = maxf(0, 1 - normalized_distance * %Vectorscope.length_penalty)
+    color.a = maxf(0, 1 - normalized_distance * penalty)
     return color
