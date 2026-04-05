@@ -23,18 +23,9 @@ func _draw() -> void:
     
     var sample_rate: float = WasapiLoopbackRecorder.SampleRate \
         if %Vectorscope.loopback \
-        else AudioServer.get_mix_rate()
+        else AudioServer.get_mix_rate() * %Vectorscope.audio_player.pitch_scale # TODO: check if '* %Vectorscope.audio_player.pitch_scale' makes sense
 
     var frame_buffer_size: int = WasapiLoopbackRecorder.OptimalFrameBufferSize(sample_rate)
-
-    # TODO: Remove
-    if Engine.get_frames_drawn() % 60 == 0:
-        print(frame_buffer_size)
-        print(1 / WasapiLoopbackRecorder.DeltaTime)
-        print(WasapiLoopbackRecorder.DeltaTime)
-        print(Engine.get_frames_per_second())
-        print(DisplayServer.screen_get_refresh_rate())
-        print()
 
     if not %Vectorscope.loopback and (%Vectorscope.audio_player.stream_paused or capture.get_frames_available() < frame_buffer_size):
         return
@@ -47,6 +38,8 @@ func _draw() -> void:
         if %Vectorscope.loopback \
         else capture.get_buffer(frame_buffer_size)
 
+    # TODO: fix empty frame buffer for a few seconds after turning on loopback.
+    # Not necessarily empty but sometimes ranges from only 16 to 18 frames
     if frame_buffer.is_empty():
         return
 
@@ -64,7 +57,7 @@ func _draw() -> void:
         
     var sub_viewport: VectorscopeSubViewport = %Vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
-    var dt: float = WasapiLoopbackRecorder.DeltaTime
+    var dt: float = WasapiLoopbackRecorder.DeltaTime # TODO: sometimes really low like 0.0003 when the above TODO applies
     var time_multiplier = 1 if %Vectorscope.loopback else %Vectorscope.audio_player.pitch_scale
     var exponent: float = 1000 * dt * time_multiplier * frame_buffer_size / sample_rate
     var alpha: float = 1 - %Vectorscope.persistence ** exponent
@@ -98,6 +91,7 @@ func _get_point_from_frame(frame: Vector2) -> Vector2:
 func _calc_color(previous_frame: Vector2, current_frame: Vector2) -> Color:
     var distance := previous_frame.distance_to(current_frame)
     var normalized_distance: float = distance / (%Vectorscope.plot_scale * SQRT_8)
+    var penalty: float = %Vectorscope.length_penalty / sqrt(%Vectorscope.audio_player.pitch_scale)
     var color := Color(%Vectorscope.line_color)
-    color.a = maxf(0, 1 - normalized_distance * %Vectorscope.length_penalty) # TODO: take time_multiplier into account
+    color.a = maxf(0, 1 - normalized_distance * penalty)
     return color
