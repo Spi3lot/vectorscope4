@@ -158,6 +158,16 @@ tooltip_text = "Whether to capture all currently replayed audio or play a specif
 focus_mode = 0
 mouse_default_cursor_shape = 16
 
+[node name="ErrorLabel" type="Label" parent="UI/MarginContainer/HBox/VBox/Loopback" unique_id=396121547]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 36.0
+offset_top = 22.0
+offset_right = 111.0
+offset_bottom = 45.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+text = "Error"
+
 [node name="AntiAliasing" type="Control" parent="UI/MarginContainer/HBox/VBox" unique_id=1071967015]
 layout_mode = 2
 
@@ -339,8 +349,8 @@ focus_mode = 0
 mouse_default_cursor_shape = 16
 min_value = 0.01
 max_value = 4.0
-step = 0.25
-value = 1.01
+step = 0.248
+value = 1.002
 
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer" unique_id=1808778296]
 layout_mode = 2

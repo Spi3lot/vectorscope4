@@ -77,13 +77,17 @@ func _on_seek_drag_ended(value_changed: bool) -> void:
 
 func _on_loopback_toggled(toggled_on: bool) -> void:
     var error: Error = WasapiLoopbackRecorder.SetRecording(toggled_on)
+    var label: Label = loopback_button.get_parent().get_node('ErrorLabel')
+    label.text = ""
 
     if error != OK:
         if error == ERR_CANT_OPEN:
-            pass # TODO: Display error in UI
-    
-        loopback_button.set_pressed_no_signal(not toggled_on)
-        return
+            label.text = "Can't open any audio output device for loopback"
+        else:
+            label.text = "An error occurred"
+
+        toggled_on = not toggled_on
+        loopback_button.set_pressed_no_signal(toggled_on)
 
     pan_control.visible = not toggled_on
     speed_control.visible = not toggled_on
