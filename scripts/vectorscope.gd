@@ -31,12 +31,12 @@ class_name Vectorscope
 @export var audio_player: AudioStreamPlayer
 @export var sub_viewport_container: VectorscopeSubViewportContainer
 
-func _ready():
+func _ready() -> void:
     audio_player.finished.connect(_select_file)
     %FileDialog.file_selected.connect(_on_file_selected)
     
 
-func _input(event: InputEvent):
+func _input(event: InputEvent) -> void:
     if event is not InputEventKey or not event.pressed or event.echo:
         return
     
@@ -48,15 +48,15 @@ func _input(event: InputEvent):
                 _select_file()
 
 
-func _on_file_selected(path: String):
+func _on_file_selected(path: String) -> void:
     audio_player.stream = AudioLoader.loadfile(path)
     audio_player.play()
     
 
-func _select_file():
+func _select_file() -> void:
     %FileDialog.visible = true
 
 
-func _optimize_line_width():
+func _optimize_line_width() -> void:
     if not line_antialiasing and is_equal_approx(line_width, 1):
         line_width = -1
