@@ -81,7 +81,7 @@ func _draw() -> void:
 func _get_point_from_frame(frame: Vector2) -> Vector2:
     frame.y = -frame.y
     var viewport_size := Vector2(%Vectorscope.sub_viewport_container.sub_viewport.size)
-    var min_aspect := mini(viewport_size.x, viewport_size.y)
+    var min_aspect := mini(int(viewport_size.x), int(viewport_size.y))
     return (frame * min_aspect + viewport_size) / 2
 
 
