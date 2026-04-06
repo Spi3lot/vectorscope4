@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -12,47 +11,19 @@ namespace Vectorscope.Scripts;
 public partial class WasapiLoopbackRecorder : Node
 {
 
-    private const double DefaultFps = 60;
-
     private readonly SemaphoreSlim _writeSemaphore = new(1, 1);
 
     private readonly WaveProcessor _waveProcessor = new();
 
     private WasapiLoopbackCapture _capture;
 
-    private long _lastUpdateDtTimestamp;
+    private CancellationTokenSource _cts;
 
     public float Scale { get; set; } = 1;
 
     public double SampleRate => _waveProcessor.WaveFormat.SampleRate;
 
-    public double DeltaTime { get; private set; } = 1 / DefaultFps;
-
-    public int OptimalFrameBufferSize(double sampleRate) => Mathf.RoundToInt(sampleRate * DeltaTime);
-
-    public void UpdateDeltaTime()
-    {
-        DeltaTime = CalculateDeltaTime();
-        _lastUpdateDtTimestamp = Stopwatch.GetTimestamp();
-    }
-
-    private double CalculateDeltaTime()
-    {
-        return (_lastUpdateDtTimestamp != 0)
-            ? Stopwatch.GetElapsedTime(_lastUpdateDtTimestamp).TotalSeconds
-            : 1 / GetMaxFps();
-    }
-
-    private static double GetMaxFps()
-    {
-        if (Engine.MaxFps > 0)
-        {
-            return Engine.MaxFps;
-        }
-
-        float refreshRate = DisplayServer.ScreenGetRefreshRate();
-        return (refreshRate <= 0) ? DefaultFps : refreshRate;
-    }
+    public Vector2[] GetBuffer(int frames) => _waveProcessor.ReadStereo(frames, Scale);
 
     public Error SetRecording(bool value)
     {
@@ -78,41 +49,10 @@ public partial class WasapiLoopbackRecorder : Node
             return Error.CantOpen;
         }
 
-        var cts = new CancellationTokenSource();
-
-        _capture.RecordingStopped += async (_, _) =>
-        {
-            await cts.CancelAsync();
-            cts.Dispose();
-        };
-
-        _capture.DataAvailable += async (_, args) =>
-        {
-            bool semaphoreAcquired = false;
-
-            try
-            {
-                await _writeSemaphore.WaitAsync(cts.Token);
-                semaphoreAcquired = true;
- 
-                await _waveProcessor.Pipe.Writer.WriteAsync(
-                    args.Buffer.AsMemory(0, args.BytesRecorded),
-                    cts.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                // Recording stopped (probably because loopback mode was turned off)
-            }
-            finally
-            {
-                if (semaphoreAcquired)
-                {
-                    _writeSemaphore.Release();
-                }
-            }
-        };
-
         _waveProcessor.WaveFormat = _capture.WaveFormat;
+        _cts = new CancellationTokenSource();
+        _capture.RecordingStopped += RecordingStopped;
+        _capture.DataAvailable += DataAvailable;
         _capture.StartRecording();
         return Error.Ok;
     }
@@ -127,6 +67,53 @@ public partial class WasapiLoopbackRecorder : Node
         return Error.Ok;
     }
 
-    public Vector2[] GetBuffer(int frames) => _waveProcessor.ReadStereo(frames, Scale);
+    private async void RecordingStopped(object sender, StoppedEventArgs args)
+    {
+        try
+        {
+            if (args.Exception is not null)
+            {
+                GD.PushError(args.Exception.ToString());
+            }
+
+            await _cts.CancelAsync();
+            _cts.Dispose();
+            _cts = null;
+        }
+        catch (Exception ex)
+        {
+            GD.PushError(ex.ToString());
+        }
+    }
+
+    private async void DataAvailable(object sender, WaveInEventArgs args)
+    {
+        bool semaphoreAcquired = false;
+
+        try
+        {
+            await _writeSemaphore.WaitAsync(_cts.Token);
+            semaphoreAcquired = true;
+
+            await _waveProcessor.Pipe.Writer.WriteAsync(
+                args.Buffer.AsMemory(0, args.BytesRecorded),
+                _cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // Recording stopped (probably because loopback mode was turned off)
+        }
+        catch (Exception ex)
+        {
+            GD.PushError(ex.ToString());
+        }
+        finally
+        {
+            if (semaphoreAcquired)
+            {
+                _writeSemaphore.Release();
+            }
+        }
+    }
 
 }

@@ -6,25 +6,25 @@ var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
 var line_whites := PackedColorArray()
 var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
+var dt: float
 
-func _process(_delta: float) -> void:
+# Updating dt regardless of whether we're actually going to draw
+# anything or not. This ensures we capture how fast we COULD draw, which
+# is exactly what we want here. This means that if we're rendering many
+# frames without actually drawing anything, the optimal frame buffer
+# size should drop. Slowly but steadily we should be approaching the
+# perfect combination of frame rate and buffer size.
+func _process(delta: float) -> void:
+    dt = delta
     queue_redraw()
 
 
 func _draw() -> void:
-    # Updating delta time regardless of whether we're actually going to draw
-    # anything or not. This ensures we capture how fast we COULD draw, which
-    # is exactly what we want here. This means that if we're rendering many
-    # frames without actually drawing anything, the optimal frame buffer
-    # size should drop. Slowly but steadily we should be approaching the
-    # perfect combination of frame rate and buffer size.
-    WasapiLoopbackRecorder.UpdateDeltaTime()
-    
     var sample_rate: float = WasapiLoopbackRecorder.SampleRate \
         if %Vectorscope.loopback \
         else AudioServer.get_mix_rate()
 
-    var frame_buffer_size: int = WasapiLoopbackRecorder.OptimalFrameBufferSize(sample_rate)
+    var frame_buffer_size: int = _optimal_frame_buffer_size(sample_rate)
 
     if not %Vectorscope.loopback and (%Vectorscope.audio_player.stream_paused or capture.get_frames_available() < frame_buffer_size):
         return
@@ -54,7 +54,6 @@ func _draw() -> void:
         
     var sub_viewport: VectorscopeSubViewport = %Vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
-    var dt: float = WasapiLoopbackRecorder.DeltaTime
     var time_multiplier = 1 if %Vectorscope.loopback else %Vectorscope.audio_player.pitch_scale
     var exponent: float = 1000 * dt * time_multiplier * frame_buffer_size / sample_rate
     var alpha: float = 1 - %Vectorscope.persistence ** exponent
@@ -76,6 +75,10 @@ func _draw() -> void:
         %Vectorscope.line_glow * (1 if %Vectorscope.line_width < 0 else %Vectorscope.line_width),
         %Vectorscope.line_antialiasing
     )
+
+
+func _optimal_frame_buffer_size(sample_rate: float) -> int:
+    return roundi(sample_rate * dt)
 
 
 func _get_point_from_frame(frame: Vector2) -> Vector2:
