@@ -1,7 +1,6 @@
 extends Node2D
 
-# How fast to eat the backlog. 0.1 means we consume the dt amount + 10% of the leftover backlog every frame.
-const CATCH_UP_SPEED: float = 0.1 
+const CATCH_UP_SPEED: float = 0.25 # Means we consume the dt amount + 25% of the backlog (spreading it across 4 frames)
 const SQRT_8 := sqrt(8.0)
 var frame_buffer := PackedVector2Array()
 var line_positions := PackedVector2Array()
