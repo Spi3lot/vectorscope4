@@ -6,14 +6,8 @@ var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
 var line_whites := PackedColorArray()
 var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
-var dt: float
+var dt: float # _draw is called once before _process which means dt is going to be 0 there, which is fine.
 
-# Updating dt regardless of whether we're actually going to draw
-# anything or not. This ensures we capture how fast we COULD draw, which
-# is exactly what we want here. This means that if we're rendering many
-# frames without actually drawing anything, the optimal frame buffer
-# size should drop. Slowly but steadily we should be approaching the
-# perfect combination of frame rate and buffer size.
 func _process(delta: float) -> void:
     dt = delta
     queue_redraw()
