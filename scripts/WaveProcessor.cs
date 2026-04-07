@@ -56,19 +56,16 @@ public class WaveProcessor
             return [];
         }
 
-        int framesAvailable = (int) (result.Buffer.Length / WaveFormat.BlockAlign);
-        int framesToRead = Math.Min(framesAvailable, requestedFrameCount);
-
-        if (framesToRead <= 0)
+        if (result.Buffer.Length < requestedFrameCount * WaveFormat.BlockAlign)
         {
             Pipe.Reader.AdvanceTo(result.Buffer.Start, result.Buffer.End);
             return [];
         }
 
         var reader = new SequenceReader<byte>(result.Buffer);
-        var vectors = new Vector2[framesToRead];
+        var vectors = new Vector2[requestedFrameCount];
 
-        for (int i = 0; i < framesToRead; i++)
+        for (int i = 0; i < requestedFrameCount; i++)
         {
             vectors[i] = scale * ReadStereoFrame(ref reader);
         }
