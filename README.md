@@ -1,4 +1,4 @@
-Download on **itch.io**: [Vectorscope V4 by Spi3lot](https://spi3lot.itch.io/vectorscope-v4)
+Download right [here](https://github.com/Spi3lot/vectorscope4/releases) on **GitHub** or on **itch.io**: [Vectorscope V4 by Spi3lot](https://spi3lot.itch.io/vectorscope-v4)
 
 This tool gives you the ability to visualize stereo songs! And mono ones as well, but that'll look pretty boring. More than 2 channels are sadly not supported yet.
 
@@ -11,4 +11,3 @@ History of utilized technologies in my vectorscope series
 - V2 - Unity
 - V3 - Processing 4
 - V4 - Godot 4
- 
