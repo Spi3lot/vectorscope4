@@ -1,12 +1,13 @@
 extends Node2D
 
+const CATCH_UP_SPEED: float = 0.25 # Means we consume the dt amount + 25% of the backlog (spreading it across 4 frames)
 const SQRT_8 := sqrt(8.0)
 var frame_buffer := PackedVector2Array()
 var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
 var line_whites := PackedColorArray()
 var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
-var dt: float # _draw is called once before _process which means dt is going to be 0 there, which is fine.
+var dt: float = 0.0
 
 func _process(delta: float) -> void:
     dt = delta
@@ -14,6 +15,9 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
+    if dt == 0.0:
+        return
+
     var sample_rate: float = WasapiLoopbackRecorder.SampleRate \
         if %Vectorscope.loopback \
         else AudioServer.get_mix_rate()
@@ -31,7 +35,9 @@ func _draw() -> void:
         if %Vectorscope.loopback \
         else capture.get_buffer(frame_buffer_size)
 
-    if frame_buffer.is_empty():
+    frame_buffer_size = len(frame_buffer)
+
+    if frame_buffer_size == 0:
         return
 
     line_positions.resize(frame_buffer_size * 2)
@@ -50,7 +56,7 @@ func _draw() -> void:
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
     var time_multiplier = 1 if %Vectorscope.loopback else %Vectorscope.audio_player.pitch_scale
     var audio_duration := frame_buffer_size / sample_rate
-    var exponent: float = 10.0 * time_multiplier * audio_duration
+    var exponent: float = 50.0 * time_multiplier * audio_duration
     var alpha: float = 1 - %Vectorscope.persistence ** exponent
     sub_viewport.drawer.draw_rect(rect, Color(Color.BLACK, alpha), true)
 
@@ -73,7 +79,14 @@ func _draw() -> void:
 
 
 func _optimal_frame_buffer_size(sample_rate: float) -> int:
-    return roundi(sample_rate * dt)
+    var ideal_frames: float = sample_rate * dt
+    var available_frames: int = WasapiLoopbackRecorder.GetAvailableFrames()
+
+    if available_frames < ideal_frames:
+        return available_frames
+
+    var frames_to_request: float = lerpf(ideal_frames, available_frames, CATCH_UP_SPEED)
+    return roundi(frames_to_request)
 
 
 func _get_point_from_frame(frame: Vector2) -> Vector2:

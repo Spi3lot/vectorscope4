@@ -12,9 +12,21 @@ namespace Vectorscope.Scripts;
 public class WaveProcessor
 {
 
-    public Pipe Pipe { get; } = new();
+    public Pipe Pipe { get; } = new(new PipeOptions(pauseWriterThreshold: 0, resumeWriterThreshold: 0));
 
     public WaveFormat WaveFormat { get; set; }
+
+    public int GetAvailableFrames()
+    {
+        if (!Pipe.Reader.TryRead(out var result))
+        {
+            return 0;
+        }
+
+        int available = (int) (result.Buffer.Length / WaveFormat.BlockAlign);
+        Pipe.Reader.AdvanceTo(result.Buffer.Start, result.Buffer.Start);
+        return available;
+    }
 
     /// <summary>
     /// Reads and returns the requested amount of stereo audio frames as <code>Vector2</code>
