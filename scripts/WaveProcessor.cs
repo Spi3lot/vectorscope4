@@ -12,7 +12,7 @@ namespace Vectorscope.Scripts;
 public class WaveProcessor
 {
 
-    public Pipe Pipe { get; } = new();
+    public Pipe Pipe { get; } = new(new PipeOptions(pauseWriterThreshold: 0, resumeWriterThreshold: 0));
 
     public WaveFormat WaveFormat { get; set; }
 
