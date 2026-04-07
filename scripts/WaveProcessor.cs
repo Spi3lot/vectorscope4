@@ -16,6 +16,18 @@ public class WaveProcessor
 
     public WaveFormat WaveFormat { get; set; }
 
+    public int GetAvailableFrames()
+    {
+        if (!Pipe.Reader.TryRead(out var result))
+        {
+            return 0;
+        }
+
+        int available = (int) (result.Buffer.Length / WaveFormat.BlockAlign);
+        Pipe.Reader.AdvanceTo(result.Buffer.Start, result.Buffer.Start);
+        return available;
+    }
+
     /// <summary>
     /// Reads and returns the requested amount of stereo audio frames as <code>Vector2</code>
     /// </summary>
@@ -44,16 +56,19 @@ public class WaveProcessor
             return [];
         }
 
-        if (result.Buffer.Length < requestedFrameCount * WaveFormat.BlockAlign)
+        int framesAvailable = (int) (result.Buffer.Length / WaveFormat.BlockAlign);
+        int framesToRead = Math.Min(framesAvailable, requestedFrameCount);
+
+        if (framesToRead <= 0)
         {
             Pipe.Reader.AdvanceTo(result.Buffer.Start, result.Buffer.End);
             return [];
         }
 
         var reader = new SequenceReader<byte>(result.Buffer);
-        var vectors = new Vector2[requestedFrameCount];
+        var vectors = new Vector2[framesToRead];
 
-        for (int i = 0; i < requestedFrameCount; i++)
+        for (int i = 0; i < framesToRead; i++)
         {
             vectors[i] = scale * ReadStereoFrame(ref reader);
         }
