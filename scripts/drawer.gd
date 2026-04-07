@@ -92,6 +92,5 @@ func _calc_color(previous_frame: Vector2, current_frame: Vector2) -> Color:
     var distance := previous_frame.distance_to(current_frame)
     var normalized_distance: float = distance / (%Vectorscope.plot_scale * SQRT_8)
     var penalty: float = %Vectorscope.length_penalty / sqrt(%Vectorscope.audio_player.pitch_scale)
-    var color := Color(%Vectorscope.line_color)
-    color.a = maxf(0, 1 - normalized_distance * penalty)
-    return color
+    var alpha := maxf(0, 1 - normalized_distance * penalty)
+    return Color(%Vectorscope.line_color, alpha)
