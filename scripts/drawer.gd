@@ -8,7 +8,7 @@ var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
 var line_whites := PackedColorArray()
 var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
-var dt: float # _draw is called once before _process which means dt is going to be 0 there, which is fine.
+var dt: float = 0.0
 
 func _process(delta: float) -> void:
     dt = delta
@@ -16,6 +16,9 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
+    if dt == 0.0:
+        return
+
     var sample_rate: float = WasapiLoopbackRecorder.SampleRate \
         if %Vectorscope.loopback \
         else AudioServer.get_mix_rate()
