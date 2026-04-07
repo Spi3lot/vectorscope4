@@ -57,7 +57,7 @@ func _draw() -> void:
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
     var time_multiplier = 1 if %Vectorscope.loopback else %Vectorscope.audio_player.pitch_scale
     var audio_duration := frame_buffer_size / sample_rate
-    var exponent: float = 10.0 * time_multiplier * audio_duration
+    var exponent: float = 50.0 * time_multiplier * audio_duration
     var alpha: float = 1 - %Vectorscope.persistence ** exponent
     sub_viewport.drawer.draw_rect(rect, Color(Color.BLACK, alpha), true)
 
