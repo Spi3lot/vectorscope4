@@ -81,24 +81,11 @@ func _draw() -> void:
 func _optimal_frame_buffer_size(sample_rate: float) -> int:
     var ideal_frames: float = sample_rate * dt
     var available_frames: int = WasapiLoopbackRecorder.GetAvailableFrames()
-    
-    # How many frames are sitting in the pipe beyond what we want for this dt?
-    var backlog: float = float(available_frames) - ideal_frames
-    
-    var frames_to_request: float = ideal_frames
-    
-    if backlog > 0:
-        # THE PANIC THRESHOLD
-        # If the backlog is massive (e.g., > 100ms of audio), it's probably because 
-        # of startup delay. Don't smooth it, just dump it to instantly sync.
-        if backlog > sample_rate * 0.1: 
-            return available_frames 
-            
-        # THE RUBBER BAND
-        # We are slightly behind. Add a fraction of the backlog to our request.
-        # This smoothly spreads the extra data across the next ~10 frames.
-        frames_to_request += backlog * CATCH_UP_SPEED
-        
+
+    if available_frames < ideal_frames:
+        return available_frames
+
+    var frames_to_request: float = lerpf(ideal_frames, available_frames, CATCH_UP_SPEED)
     return roundi(frames_to_request)
 
 
