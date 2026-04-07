@@ -1,6 +1,6 @@
 extends Node2D
 
-const SQRT_8 := sqrt(8)
+const SQRT_8 := sqrt(8.0)
 var frame_buffer := PackedVector2Array()
 var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
