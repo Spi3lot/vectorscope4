@@ -16,7 +16,7 @@ public class WaveProcessor
 
     public WaveFormat WaveFormat { get; set; }
 
-    public int GetAvailableFrames()
+    public int GetFramesAvailable()
     {
         if (!Pipe.Reader.TryRead(out var result))
         {

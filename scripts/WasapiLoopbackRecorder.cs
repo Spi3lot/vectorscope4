@@ -23,7 +23,7 @@ public partial class WasapiLoopbackRecorder : Node
 
     public double SampleRate => _waveProcessor.WaveFormat.SampleRate;
 
-    public int GetAvailableFrames() => _waveProcessor.GetAvailableFrames();
+    public int GetFramesAvailable() => _waveProcessor.GetFramesAvailable();
 
     public Vector2[] GetBuffer(int frames) => _waveProcessor.ReadStereo(frames, Scale);
 
