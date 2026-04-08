@@ -90,7 +90,7 @@ func _calc_line_color(previous_frame: Vector2, current_frame: Vector2) -> Color:
 
 
 func _draw_fade_rect(frame_buffer_size: int, sample_rate: float, time_multiplier: float) -> void:
-    var sub_viewport: VectorscopeSubViewport = %Vectorscope.sub_viewport_container.sub_viewport
+    var sub_viewport: SubViewport = %Vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
     var audio_duration := frame_buffer_size / sample_rate
     var exponent: float = 25.0 * time_multiplier * audio_duration
