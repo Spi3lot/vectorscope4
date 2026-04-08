@@ -81,7 +81,7 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 script = ExtResource("3_lpaer")
-volume_label = NodePath("VBoxContainer/HBoxContainer/Volume/Label")
+volume_label = NodePath("VBoxContainer/HBoxContainer/Volume/Control/Label")
 volume_slider = NodePath("VBoxContainer/HBoxContainer/Volume/VSlider")
 loopback_button = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Loopback/HBoxContainer/CheckButton")
 persistence_slider = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Persistence/HSlider")
@@ -96,14 +96,26 @@ layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="UI/MarginContainer/VBoxContainer" unique_id=1580705418]
 layout_mode = 2
-size_flags_horizontal = 0
 
 [node name="Volume" type="HBoxContainer" parent="UI/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1274472317]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/Volume" unique_id=858546287]
+[node name="Control" type="Control" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/Volume" unique_id=713211385]
 visible = false
+custom_minimum_size = Vector2(24, 50)
 layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/Volume/Control" unique_id=858546287]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -2.0
+offset_right = 65.0
+offset_bottom = 20.333374
+grow_vertical = 0
+rotation = -1.5707964
 text = "Volume"
 
 [node name="VSlider" type="VSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/Volume" unique_id=593845710]
@@ -148,7 +160,6 @@ text = "Error"
 
 [node name="AntiAliasing" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=704622324]
 layout_mode = 2
-size_flags_stretch_ratio = 0.58
 
 [node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/AntiAliasing" unique_id=1914796632]
 layout_mode = 2
