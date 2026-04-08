@@ -1,4 +1,4 @@
 extends SubViewportContainer
 class_name VectorscopeSubViewportContainer
 
-@export var sub_viewport: VectorscopeSubViewport
+@export var sub_viewport: SubViewport

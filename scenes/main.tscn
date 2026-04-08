@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://c6a4ab76lw0la" path="res://scripts/vectorscope.gd" id="1_uuccd"]
 [ext_resource type="Script" uid="uid://bx2dfhfudvr6m" path="res://scripts/vectorscope_sub_viewport_container.gd" id="2_x10s1"]
-[ext_resource type="Script" uid="uid://1rqqiw54h1pl" path="res://scripts/vectorscope_sub_viewport.gd" id="3_fgrir"]
 [ext_resource type="Script" uid="uid://bsxnyrqat418p" path="res://scripts/ui.gd" id="3_lpaer"]
 [ext_resource type="Script" uid="uid://02nwm3yn0pe2" path="res://scripts/drawer.gd" id="4_tbgi4"]
 
@@ -53,19 +52,16 @@ grow_horizontal = 2
 grow_vertical = 2
 stretch = true
 script = ExtResource("2_x10s1")
-sub_viewport = NodePath("VectorscopeSubViewport")
+sub_viewport = NodePath("SubViewport")
 metadata/_edit_lock_ = true
 
-[node name="VectorscopeSubViewport" type="SubViewport" parent="Vectorscope/VectorscopeSubViewportContainer" unique_id=529493362 node_paths=PackedStringArray("drawer")]
+[node name="SubViewport" type="SubViewport" parent="Vectorscope/VectorscopeSubViewportContainer" unique_id=1193102148]
 disable_3d = true
 handle_input_locally = false
 size = Vector2i(1152, 648)
 render_target_clear_mode = 1
-render_target_update_mode = 4
-script = ExtResource("3_fgrir")
-drawer = NodePath("Drawer")
 
-[node name="Drawer" type="Node2D" parent="Vectorscope/VectorscopeSubViewportContainer/VectorscopeSubViewport" unique_id=2036080093]
+[node name="Drawer" type="Node2D" parent="Vectorscope/VectorscopeSubViewportContainer/SubViewport" unique_id=2036080093]
 script = ExtResource("4_tbgi4")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=499037899]
