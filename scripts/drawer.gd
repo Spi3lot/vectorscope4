@@ -93,7 +93,7 @@ func _draw_fade_rect(frame_buffer_size: int, sample_rate: float, time_multiplier
     var sub_viewport: VectorscopeSubViewport = %Vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
     var audio_duration := frame_buffer_size / sample_rate
-    var exponent: float = 50.0 * time_multiplier * audio_duration
+    var exponent: float = 25.0 * time_multiplier * audio_duration
     var alpha: float = 1 - %Vectorscope.persistence ** exponent
     draw_rect(rect, Color(Color.BLACK, alpha), true)
 
