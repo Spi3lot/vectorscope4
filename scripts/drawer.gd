@@ -9,6 +9,12 @@ var frame_buffer := PackedVector2Array()
 var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
 var line_whites := PackedColorArray()
+var time_multiplier: float
+var sample_rate: float
+
+var lasttk: int
+var t : float
+var consumed : int
 
 @onready var capture: AudioEffectCapture = AudioServer.get_bus_effect(
     %Vectorscope.bus_idx,
@@ -16,54 +22,53 @@ var line_whites := PackedColorArray()
 )
 
 func _process(delta: float) -> void:
-    dt = delta
-    queue_redraw()
+    if Engine.get_frames_drawn() % 300 == 0:
+        consumed = 0
+        lasttk = Time.get_ticks_usec()
+    t = (Time.get_ticks_usec()-lasttk)/1e6
 
-
-func _draw() -> void:
-    if dt == 0.0 or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
+    if delta == 0.0 or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
         return
 
     var previous_frame := Vector2.ZERO \
         if frame_buffer.is_empty() \
         else frame_buffer[-1]
 
-    var time_multiplier: float
-    var sample_rate: float
-
     if %Vectorscope.loopback:
         time_multiplier = 1.0
         sample_rate = WasapiLoopbackRecorder.SampleRate
         var available: int = WasapiLoopbackRecorder.GetFramesAvailable()
-        var size: int = _optimal_frame_buffer_size(sample_rate, available)
+        var size: int = _optimal_frame_buffer_size(delta, available)
         frame_buffer = WasapiLoopbackRecorder.GetBuffer(size)
+        consumed += len(frame_buffer)
+        print((consumed + WasapiLoopbackRecorder.GetFramesAvailable()) / t)
     else:
         time_multiplier = %Vectorscope.audio_player.pitch_scale
         sample_rate = AudioServer.get_mix_rate()
         var available: int = capture.get_frames_available()
-        var size: int = _optimal_frame_buffer_size(sample_rate, available)
+        var size: int = _optimal_frame_buffer_size(delta, available)
         frame_buffer = capture.get_buffer(size)
 
-    var frame_buffer_size := len(frame_buffer)
+    if len(frame_buffer) > 0:
+        _update_line_properties(previous_frame)
+        queue_redraw()
 
-    if frame_buffer_size == 0:
-        return
 
-    _update_line_properties(frame_buffer_size, previous_frame)
-    _draw_fade_rect(frame_buffer_size, sample_rate, time_multiplier)
+func _draw() -> void:
+    _draw_fade_rect()
     _draw_multilines()
 
 
-func _optimal_frame_buffer_size(sample_rate: float, frames_available: int) -> int:
-    var ideal_frames: float = sample_rate * dt
+func _optimal_frame_buffer_size(dt: float, frames_available: int) -> int:
+    var ideal_frames := sample_rate * dt
 
-    if frames_available < ideal_frames:
-        return frames_available
+    return frames_available \
+        if frames_available < ideal_frames \
+        else roundi(lerpf(ideal_frames, frames_available, CATCH_UP_SPEED))
 
-    return roundi(lerpf(ideal_frames, frames_available, CATCH_UP_SPEED))
 
-
-func _update_line_properties(frame_buffer_size: int, previous_frame: Vector2) -> void:
+func _update_line_properties(previous_frame: Vector2) -> void:
+    var frame_buffer_size := len(frame_buffer)
     line_positions.resize(frame_buffer_size * 2)
     line_colors.resize(frame_buffer_size)
     line_whites.resize(frame_buffer_size)
@@ -92,10 +97,10 @@ func _calc_line_color(previous_frame: Vector2, current_frame: Vector2) -> Color:
     return Color(%Vectorscope.line_color, alpha)
 
 
-func _draw_fade_rect(frame_buffer_size: int, sample_rate: float, time_multiplier: float) -> void:
+func _draw_fade_rect() -> void:
     var sub_viewport: SubViewport = %Vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
-    var audio_duration := frame_buffer_size / sample_rate
+    var audio_duration := len(frame_buffer) / sample_rate
     var exponent: float = 25.0 * time_multiplier * audio_duration
     var alpha: float = 1 - %Vectorscope.persistence ** exponent
     draw_rect(rect, Color(Color.BLACK, alpha), true)
