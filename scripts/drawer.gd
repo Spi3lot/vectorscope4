@@ -9,8 +9,11 @@ var frame_buffer := PackedVector2Array()
 var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
 var line_whites := PackedColorArray()
-var capture: AudioEffectCapture = AudioServer.get_bus_effect(0, AudioServer.get_bus_effect_count(0) - 1)
-var dt: float = 0.0
+
+@onready var capture: AudioEffectCapture = AudioServer.get_bus_effect(
+    %Vectorscope.bus_idx,
+    AudioServer.get_bus_effect_count(%Vectorscope.bus_idx) - 1
+)
 
 func _process(delta: float) -> void:
     dt = delta

@@ -56,7 +56,7 @@ func _on_persistence_value_changed(value: float) -> void:
 
 
 func _on_pan_value_changed(value: float) -> void:
-    var panner: AudioEffectPanner = AudioServer.get_bus_effect(0, 0)
+    var panner: AudioEffectPanner = AudioServer.get_bus_effect(%Vectorscope.bus_idx, 0)
     panner.pan = value
 
 

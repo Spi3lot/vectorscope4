@@ -42,6 +42,7 @@ sub_viewport_container = NodePath("VectorscopeSubViewportContainer")
 metadata/_edit_lock_ = true
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Vectorscope" unique_id=1540043901]
+bus = &"Player"
 
 [node name="VectorscopeSubViewportContainer" type="SubViewportContainer" parent="Vectorscope" unique_id=784740499 node_paths=PackedStringArray("sub_viewport")]
 layout_mode = 1
