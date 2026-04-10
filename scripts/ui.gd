@@ -3,6 +3,7 @@ extends Control
 @export var volume_label: Label
 @export var volume_slider: VSlider
 @export var loopback_button: CheckButton
+@export var loopback_error_label: Label
 @export var persistence_slider: HSlider
 @export var penalty_slider: HSlider
 @export var pan_control: Control
@@ -77,14 +78,12 @@ func _on_seek_drag_ended(value_changed: bool) -> void:
 
 func _on_loopback_toggled(toggled_on: bool) -> void:
     var error: Error = WasapiLoopbackRecorder.SetRecording(toggled_on)
-    var label: Label = loopback_button.get_parent().get_node('ErrorLabel')
-    label.text = ""
+    loopback_error_label.text = ""
 
     if error != OK:
-        if error == ERR_CANT_OPEN:
-            label.text = "Can't open any audio output device for loopback"
-        else:
-            label.text = "An error occurred"
+        loopback_error_label.text = "Can't open any audio output device for loopback" \
+            if error == ERR_CANT_OPEN \
+            else "An error occurred"
 
         toggled_on = not toggled_on
         loopback_button.set_pressed_no_signal(toggled_on)
