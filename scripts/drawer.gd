@@ -110,6 +110,9 @@ func _draw_fade_rect() -> void:
 # multiline uses segment-by-segment coloring, while
 # polyline uses point-by-point coloring
 func _draw_multilines() -> void:
+    if len(line_positions) == 0:
+        return
+
     draw_multiline_colors(
         line_positions,
         line_colors,
