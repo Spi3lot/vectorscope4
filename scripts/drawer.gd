@@ -3,7 +3,7 @@ extends Node2D
 # 0.1 means we consume the dt amount + 10% of the backlog (=> backlog decays exponentially).
 # 10% feels safer to me than e.g. 25% as that increases the
 # backlog's half-life from ~2 frames to ~6 frames which leaves more room for high fps
-const CATCH_UP_SPEED: float = 0.1
+var CATCH_UP_SPEED: float = 0.1
 const SQRT_8 := sqrt(8.0)
 var frame_buffer := PackedVector2Array()
 var line_positions := PackedVector2Array()
@@ -25,6 +25,9 @@ func _process(delta: float) -> void:
     if Engine.get_frames_drawn() % 300 == 0:
         consumed = 0
         lasttk = Time.get_ticks_usec()
+        CATCH_UP_SPEED = 1.0
+    else:
+        CATCH_UP_SPEED = 0.1
     t = (Time.get_ticks_usec()-lasttk)/1e6
 
     if not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused:
@@ -48,6 +51,10 @@ func _process(delta: float) -> void:
         var available: int = capture.get_frames_available()
         var size: int = _optimal_frame_buffer_size(delta, available)
         frame_buffer = capture.get_buffer(size)
+        consumed += len(frame_buffer)
+        print((consumed + capture.get_frames_available()) / t)
+        print((consumed) / t)
+        print()
 
     if len(frame_buffer) > 0:
         _update_line_properties(previous_frame)
