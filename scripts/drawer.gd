@@ -27,7 +27,7 @@ func _process(delta: float) -> void:
         lasttk = Time.get_ticks_usec()
     t = (Time.get_ticks_usec()-lasttk)/1e6
 
-    if delta == 0.0 or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
+    if not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused:
         return
 
     var previous_frame := Vector2.ZERO \
