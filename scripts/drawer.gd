@@ -49,12 +49,7 @@ func _draw() -> void:
 
 
 func _get_stereo_channel_count() -> int:
-    match AudioServer.get_speaker_mode():
-        AudioServer.SPEAKER_MODE_STEREO: return 1
-        AudioServer.SPEAKER_SURROUND_31: return 2
-        AudioServer.SPEAKER_SURROUND_51: return 3
-        AudioServer.SPEAKER_SURROUND_71: return 4
-        _: return 0
+    return 1 + AudioServer.get_speaker_mode()
 
 
 func _optimal_frame_buffer_size(dt: float, frames_available: int) -> int:
