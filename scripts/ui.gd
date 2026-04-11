@@ -78,13 +78,9 @@ func _on_seek_drag_ended(value_changed: bool) -> void:
 
 func _on_loopback_toggled(toggled_on: bool) -> void:
     var error: Error = WasapiLoopbackRecorder.SetRecording(toggled_on)
-    loopback_error_label.text = ""
+    loopback_error_label.text = _get_error_text(error)
 
     if error != OK:
-        loopback_error_label.text = "Can't open any audio output device for loopback" \
-            if error == ERR_CANT_OPEN \
-            else "An error occurred"
-
         toggled_on = not toggled_on
         loopback_button.set_pressed_no_signal(toggled_on)
 
@@ -99,3 +95,11 @@ func _on_loopback_toggled(toggled_on: bool) -> void:
     else:
         volume_slider.value = db_to_linear(%Vectorscope.audio_player.volume_db)
         volume_label.text = "Volume"
+
+
+func _get_error_text(error: Error) -> String:
+    match error:
+        OK: return ""
+        ERR_CANT_OPEN: return "Can't open any audio output device for loopback"
+        ERR_CANT_RESOLVE: return "Can't decode audio stream"
+        _: return "An error occurred"
