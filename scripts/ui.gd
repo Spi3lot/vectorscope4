@@ -16,8 +16,8 @@ func _ready() -> void:
     loopback_button.button_pressed = %Vectorscope.loopback
     persistence_slider.value = %Vectorscope.persistence
     penalty_slider.value = %Vectorscope.length_penalty
-    get_tree().root.mouse_entered.connect(func(): visible = true)
-    get_tree().root.mouse_exited.connect(func(): visible = false)
+    get_tree().root.mouse_entered.connect(show)
+    get_tree().root.mouse_exited.connect(hide)
 
 
 func _process(_delta: float) -> void:
