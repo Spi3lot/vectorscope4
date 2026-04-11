@@ -52,6 +52,12 @@ public partial class WasapiLoopbackRecorder : Node
         }
 
         _waveProcessor.WaveFormat = _capture.WaveFormat;
+
+        if (_waveProcessor.WaveFormat.Encoding != WaveFormatEncoding.IeeeFloat)
+        {
+            return Error.CantResolve;
+        }
+
         _cts = new CancellationTokenSource();
         _capture.RecordingStopped += RecordingStopped;
         _capture.DataAvailable += DataAvailable;
