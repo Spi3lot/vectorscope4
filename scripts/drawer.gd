@@ -12,23 +12,12 @@ var line_whites := PackedColorArray()
 var time_multiplier: float
 var sample_rate: float
 
-var lasttk: int
-var t : float
-var consumed : int
-
 @onready var capture: AudioEffectCapture = AudioServer.get_bus_effect(
     %Vectorscope.bus_idx,
     AudioServer.get_bus_effect_count(%Vectorscope.bus_idx) - 1
 )
 
 func _process(delta: float) -> void:
-    if Engine.get_frames_drawn() % 300 == 0:
-        consumed = 0
-        lasttk = Time.get_ticks_usec()
-        capture.clear_buffer() # Destroy the stagnant backlog
-
-    t = (Time.get_ticks_usec()-lasttk)/1e6
-
     if not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused:
         return
 
@@ -42,24 +31,12 @@ func _process(delta: float) -> void:
         var available: int = WasapiLoopbackRecorder.GetFramesAvailable()
         var size: int = _optimal_frame_buffer_size(delta, available)
         frame_buffer = WasapiLoopbackRecorder.GetBuffer(size)
-        consumed += len(frame_buffer)
-        print((consumed + WasapiLoopbackRecorder.GetFramesAvailable()) / t)
-        print()
     else:
         time_multiplier = %Vectorscope.audio_player.pitch_scale
         sample_rate = AudioServer.get_mix_rate() * _get_stereo_channel_count()
         var available: int = capture.get_frames_available()
         var size: int = _optimal_frame_buffer_size(delta, available)
         frame_buffer = capture.get_buffer(size)
-
-        for i in range(size/4):
-            frame_buffer[i] = frame_buffer2[i*4]
-        
-        print(frame_buffer2.slice(0, 8))
-        consumed += len(frame_buffer)
-        print((consumed + capture.get_frames_available()) / t)
-        print((consumed) / t)
-        print()
 
     if len(frame_buffer) > 0:
         _update_line_properties(previous_frame)
