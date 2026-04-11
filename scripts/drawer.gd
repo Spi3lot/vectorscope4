@@ -47,11 +47,10 @@ func _process(delta: float) -> void:
         print()
     else:
         time_multiplier = %Vectorscope.audio_player.pitch_scale
-        sample_rate = AudioServer.get_mix_rate()
+        sample_rate = AudioServer.get_mix_rate() * _get_stereo_channel_count()
         var available: int = capture.get_frames_available()
-        var size: int = _optimal_frame_buffer_size(delta, available) / 4 * 4
-        var frame_buffer2 := capture.get_buffer(size)
-        frame_buffer.resize(size/4)
+        var size: int = _optimal_frame_buffer_size(sample_rate, available)
+        frame_buffer = capture.get_buffer(size)
 
         for i in range(size/4):
             frame_buffer[i] = frame_buffer2[i*4]
@@ -70,6 +69,15 @@ func _process(delta: float) -> void:
 func _draw() -> void:
     _draw_fade_rect()
     _draw_multilines()
+
+
+func _get_stereo_channel_count() -> int:
+    match AudioServer.get_speaker_mode():
+        AudioServer.SPEAKER_MODE_STEREO: return 1
+        AudioServer.SPEAKER_SURROUND_31: return 2
+        AudioServer.SPEAKER_SURROUND_51: return 3
+        AudioServer.SPEAKER_SURROUND_71: return 4
+        _: return 0
 
 
 func _optimal_frame_buffer_size(dt: float, frames_available: int) -> int:
