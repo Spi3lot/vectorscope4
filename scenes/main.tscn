@@ -118,14 +118,11 @@ text = "Volume"
 
 [node name="VSlider" type="VSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/Volume" unique_id=593845710]
 layout_mode = 2
-tooltip_text = "Linear amplitude/scale of the audio/plot"
+tooltip_text = "Volume/scale of the audio/plot"
 focus_mode = 0
 mouse_default_cursor_shape = 16
-min_value = 0.1
-max_value = 8.0
-step = 0.1
-value = 2.0
-exp_edit = true
+min_value = -10.0
+max_value = 10.0
 allow_greater = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer/HBoxContainer" unique_id=2072327174]

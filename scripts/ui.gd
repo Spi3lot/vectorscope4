@@ -28,12 +28,12 @@ func _process(_delta: float) -> void:
     
 
 func _on_volume_value_changed(value: float) -> void:
-    %Vectorscope.plot_scale = value
+    %Vectorscope.plot_scale = db_to_linear(value)
     
     if %Vectorscope.loopback:
-        WasapiLoopbackRecorder.Scale = value
+        WasapiLoopbackRecorder.Scale = %Vectorscope.plot_scale
     else:
-        %Vectorscope.audio_player.volume_db = linear_to_db(value)
+        %Vectorscope.audio_player.volume_db = value
 
 
 func _on_penalty_value_changed(value: float) -> void:
@@ -90,10 +90,10 @@ func _on_loopback_toggled(toggled_on: bool) -> void:
     %Vectorscope.loopback = toggled_on
     
     if toggled_on:
-        volume_slider.value = WasapiLoopbackRecorder.Scale
+        volume_slider.value = linear_to_db(WasapiLoopbackRecorder.Scale)
         volume_label.text = "Scale"
     else:
-        volume_slider.value = db_to_linear(%Vectorscope.audio_player.volume_db)
+        volume_slider.value = %Vectorscope.audio_player.volume_db
         volume_label.text = "Volume"
 
 
