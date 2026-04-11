@@ -3,7 +3,7 @@ extends Node2D
 # 0.1 means we consume the dt amount + 10% of the backlog (=> backlog decays exponentially).
 # 10% feels safer to me than e.g. 25% as that increases the
 # backlog's half-life from ~2 frames to ~6 frames which leaves more room for high fps
-var CATCH_UP_SPEED: float = 0.1
+const CATCH_UP_SPEED: float = 0.1
 const SQRT_8 := sqrt(8.0)
 var frame_buffer := PackedVector2Array()
 var line_positions := PackedVector2Array()
@@ -25,9 +25,8 @@ func _process(delta: float) -> void:
     if Engine.get_frames_drawn() % 300 == 0:
         consumed = 0
         lasttk = Time.get_ticks_usec()
-        CATCH_UP_SPEED = 1.0
-    else:
-        CATCH_UP_SPEED = 0.1
+        capture.clear_buffer() # Destroy the stagnant backlog
+
     t = (Time.get_ticks_usec()-lasttk)/1e6
 
     if not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused:
@@ -45,12 +44,19 @@ func _process(delta: float) -> void:
         frame_buffer = WasapiLoopbackRecorder.GetBuffer(size)
         consumed += len(frame_buffer)
         print((consumed + WasapiLoopbackRecorder.GetFramesAvailable()) / t)
+        print()
     else:
         time_multiplier = %Vectorscope.audio_player.pitch_scale
         sample_rate = AudioServer.get_mix_rate()
         var available: int = capture.get_frames_available()
-        var size: int = _optimal_frame_buffer_size(delta, available)
-        frame_buffer = capture.get_buffer(size)
+        var size: int = _optimal_frame_buffer_size(delta, available) / 4 * 4
+        var frame_buffer2 := capture.get_buffer(size)
+        frame_buffer.resize(size/4)
+
+        for i in range(size/4):
+            frame_buffer[i] = frame_buffer2[i*4]
+        
+        print(frame_buffer2.slice(0, 8))
         consumed += len(frame_buffer)
         print((consumed + capture.get_frames_available()) / t)
         print((consumed) / t)
