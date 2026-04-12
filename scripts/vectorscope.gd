@@ -31,7 +31,7 @@ class_name Vectorscope
 @export var audio_player: AudioStreamPlayer
 @export var sub_viewport_container: VectorscopeSubViewportContainer
 
-var bus_idx := AudioServer.get_bus_index("Player")
+var bus_idx := AudioServer.get_bus_index(&"Player")
 
 func _ready() -> void:
     audio_player.finished.connect(_select_file)
