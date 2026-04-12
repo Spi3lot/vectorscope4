@@ -5,7 +5,6 @@ resource_name = "Panner"
 
 [sub_resource type="AudioEffectCapture" id="AudioEffectCapture_7snps"]
 resource_name = "Capture"
-buffer_length = 10.0
 
 [resource]
 bus/1/name = &"Player"
