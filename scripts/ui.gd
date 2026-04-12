@@ -100,6 +100,6 @@ func _on_loopback_toggled(toggled_on: bool) -> void:
 func _get_error_text(error: Error) -> String:
     match error:
         OK: return ""
-        ERR_CANT_OPEN: return "Can't open any audio output device for loopback"
+        ERR_CANT_OPEN: return "Can't open audio device for loopback"
         ERR_CANT_RESOLVE: return "Can't decode audio stream"
         _: return "An error occurred"
