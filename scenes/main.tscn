@@ -148,10 +148,12 @@ focus_mode = 0
 mouse_default_cursor_shape = 16
 
 [node name="ErrorLabel" type="Label" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Loopback/HBoxContainer" unique_id=396121547]
+custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_colors/font_color = Color(1, 0, 0, 1)
-text = "Error"
+text = "Can't open audio device for loopback"
+autowrap_mode = 3
 
 [node name="AntiAliasing" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=704622324]
 layout_mode = 2
