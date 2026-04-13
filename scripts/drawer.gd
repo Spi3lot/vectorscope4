@@ -68,14 +68,14 @@ func _update_line_properties(previous_frame: Vector2) -> void:
 
     for i in range(frame_buffer_size):
         var frame := frame_buffer[i]
-        line_positions[i * 2] = _get_point_from_frame(previous_frame)
-        line_positions[i * 2 + 1] = _get_point_from_frame(frame)
+        line_positions[i * 2] = _frame_to_screen_space(previous_frame)
+        line_positions[i * 2 + 1] = _frame_to_screen_space(frame)
         line_colors[i] = _calc_line_color(previous_frame, frame)
         line_whites[i] = Color(Color.WHITE, line_colors[i].a)
         previous_frame = frame
 
 
-func _get_point_from_frame(frame: Vector2) -> Vector2:
+func _frame_to_screen_space(frame: Vector2) -> Vector2:
     frame.y = -frame.y
     var viewport_size: Vector2i = %Vectorscope.sub_viewport_container.sub_viewport.size
     var min_aspect := mini(viewport_size.x, viewport_size.y)
