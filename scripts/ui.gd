@@ -72,6 +72,7 @@ func _on_seek_drag_started() -> void:
 func _on_seek_drag_ended(value_changed: bool) -> void:
     if value_changed and %Vectorscope.audio_player.stream:
         %Vectorscope.audio_player.seek(seek_slider.value * %Vectorscope.audio_player.stream.get_length())
+        %Vectorscope.capture.clear_buffer()
 
     dragging = false
 

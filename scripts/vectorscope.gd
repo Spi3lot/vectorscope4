@@ -55,7 +55,8 @@ func _input(event: InputEvent) -> void:
     
     match event.keycode:
         KEY_SPACE:
-            audio_player.stream_paused = !audio_player.stream_paused
+            audio_player.stream_paused = not audio_player.stream_paused
+            capture.clear_buffer()
         KEY_ESCAPE:
             if not loopback and not %FileDialog.visible:
                 _select_file()
@@ -64,6 +65,7 @@ func _input(event: InputEvent) -> void:
 func _on_file_selected(path: String) -> void:
     audio_player.stream = AudioLoader.loadfile(path)
     audio_player.play()
+    capture.clear_buffer()
     
 
 func _select_file() -> void:
