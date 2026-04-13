@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dey7wd4sj1xjr"]
 
 [ext_resource type="Script" uid="uid://c6a4ab76lw0la" path="res://scripts/vectorscope.gd" id="1_uuccd"]
-[ext_resource type="Script" uid="uid://bx2dfhfudvr6m" path="res://scripts/vectorscope_sub_viewport_container.gd" id="2_x10s1"]
+[ext_resource type="Script" uid="uid://bx2dfhfudvr6m" path="res://scripts/fixed_sub_viewport_container.gd" id="2_x10s1"]
 [ext_resource type="Script" uid="uid://bsxnyrqat418p" path="res://scripts/ui.gd" id="3_lpaer"]
 [ext_resource type="Script" uid="uid://02nwm3yn0pe2" path="res://scripts/drawer.gd" id="4_tbgi4"]
 
@@ -61,6 +61,7 @@ disable_3d = true
 handle_input_locally = false
 size = Vector2i(1152, 648)
 render_target_clear_mode = 1
+render_target_update_mode = 4
 
 [node name="Drawer" type="Node2D" parent="Vectorscope/VectorscopeSubViewportContainer/SubViewport" unique_id=2036080093]
 script = ExtResource("4_tbgi4")
