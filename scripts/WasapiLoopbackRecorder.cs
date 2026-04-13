@@ -50,7 +50,7 @@ public partial class WasapiLoopbackRecorder : Node
     {
         try
         {
-            _capture = new WasapiLoopbackCapture();
+            _capture = new WasapiLoopbackCapture(); // Reinitialize on every start to update used audio output device
         }
         catch (COMException ex) when (ex.HResult == unchecked((int) 0x80070490)) // E_ELEMENT_NOT_FOUND
         {
