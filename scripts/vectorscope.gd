@@ -55,7 +55,8 @@ func _input(event: InputEvent) -> void:
         return
     
     match event.keycode:
-        KEY_SPACE:
+        KEY_SPACE when not loopback:
+            AudioServer.set_bus_effect_enabled(bus_idx, capture_idx, audio_player.stream_paused)
             audio_player.stream_paused = not audio_player.stream_paused
         KEY_ESCAPE when not loopback and not %FileDialog.visible:
             _select_file()
@@ -64,7 +65,7 @@ func _input(event: InputEvent) -> void:
 func _on_file_selected(path: String) -> void:
     audio_player.stream = AudioLoader.loadfile(path)
     audio_player.play()
-    capture.clear_buffer()
+    AudioServer.set_bus_effect_enabled(bus_idx, capture_idx, true)
     
 
 func _select_file() -> void:
