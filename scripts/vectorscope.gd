@@ -29,7 +29,7 @@ class_name Vectorscope
 
 @export_group("Nodes")
 @export var audio_player: AudioStreamPlayer
-@export var sub_viewport_container: VectorscopeSubViewportContainer
+@export var sub_viewport_container: FixedSubViewportContainer
 
 var bus_idx := AudioServer.get_bus_index(&"Player")
 
