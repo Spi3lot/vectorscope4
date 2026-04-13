@@ -38,7 +38,8 @@ class_name Vectorscope
 @export var sub_viewport_container: FixedSubViewportContainer
 
 @onready var bus_idx := AudioServer.get_bus_index(&"Player")
-@onready var capture: AudioEffectCapture = AudioServer.get_bus_effect(bus_idx, AudioServer.get_bus_effect_count(bus_idx) - 1)
+@onready var capture_idx := AudioServer.get_bus_effect_count(bus_idx) - 1
+@onready var capture: AudioEffectCapture = AudioServer.get_bus_effect(bus_idx, capture_idx)
 
 func _ready() -> void:
     if Engine.is_editor_hint():
@@ -56,10 +57,8 @@ func _input(event: InputEvent) -> void:
     match event.keycode:
         KEY_SPACE:
             audio_player.stream_paused = not audio_player.stream_paused
-            capture.clear_buffer()
-        KEY_ESCAPE:
-            if not loopback and not %FileDialog.visible:
-                _select_file()
+        KEY_ESCAPE when not loopback and not %FileDialog.visible:
+            _select_file()
 
 
 func _on_file_selected(path: String) -> void:
