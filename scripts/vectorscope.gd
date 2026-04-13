@@ -14,17 +14,17 @@ class_name Vectorscope
         _optimize_line_width()
 
         if line_antialiasing and line_width < 0:
-            line_width = 1
+            line_width = 1.0
 
-@export_range(1, 10) var line_width := 1:
+@export_range(1.0, 10.0) var line_width := 1.0:
     set(value):
         line_width = value
         _optimize_line_width()
 
-@export_range(0, 1) var line_glow := 0.25
-@export_range(0, 100) var length_penalty := 20
-@export_range(0, 1) var plot_scale := 1.0
-@export_range(0, 1)  var persistence := 0.5
+@export_range(0.0, 1.0) var line_glow := 0.25
+@export_range(0.0, 100.0) var length_penalty := 20
+@export_range(0.0, 1.0) var plot_scale := 1.0
+@export_range(0.0, 1.0)  var persistence := 0.5
 @export var line_color := Color.GREEN
 
 @export_group("Nodes")
@@ -60,5 +60,5 @@ func _select_file() -> void:
 
 
 func _optimize_line_width() -> void:
-    if not line_antialiasing and is_equal_approx(line_width, 1):
-        line_width = -1
+    if not line_antialiasing and is_equal_approx(line_width, 1.0):
+        line_width = -1.0
