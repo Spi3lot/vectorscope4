@@ -11,8 +11,6 @@ namespace Vectorscope.Scripts;
 public partial class WasapiLoopbackRecorder : Node
 {
 
-    private readonly SemaphoreSlim _writeSemaphore = new(1, 1);
-
     private readonly WaveProcessor _waveProcessor = new();
 
     private WasapiLoopbackCapture _capture;
@@ -102,13 +100,8 @@ public partial class WasapiLoopbackRecorder : Node
 
     private async void DataAvailable(object sender, WaveInEventArgs args)
     {
-        bool semaphoreAcquired = false;
-
         try
         {
-            await _writeSemaphore.WaitAsync(_cts.Token);
-            semaphoreAcquired = true;
-
             await _waveProcessor.Pipe.Writer.WriteAsync(
                 args.Buffer.AsMemory(0, args.BytesRecorded),
                 _cts.Token);
@@ -120,13 +113,6 @@ public partial class WasapiLoopbackRecorder : Node
         catch (Exception ex)
         {
             GD.PushError(ex.ToString());
-        }
-        finally
-        {
-            if (semaphoreAcquired)
-            {
-                _writeSemaphore.Release();
-            }
         }
     }
 
