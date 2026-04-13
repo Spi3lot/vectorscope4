@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dey7wd4sj1xjr"]
 
 [ext_resource type="Script" uid="uid://c6a4ab76lw0la" path="res://scripts/vectorscope.gd" id="1_uuccd"]
-[ext_resource type="Script" uid="uid://bx2dfhfudvr6m" path="res://scripts/vectorscope_sub_viewport_container.gd" id="2_x10s1"]
+[ext_resource type="Script" uid="uid://bx2dfhfudvr6m" path="res://scripts/fixed_sub_viewport_container.gd" id="2_x10s1"]
 [ext_resource type="Script" uid="uid://bsxnyrqat418p" path="res://scripts/ui.gd" id="3_lpaer"]
 [ext_resource type="Script" uid="uid://02nwm3yn0pe2" path="res://scripts/drawer.gd" id="4_tbgi4"]
 
@@ -42,6 +42,7 @@ sub_viewport_container = NodePath("VectorscopeSubViewportContainer")
 metadata/_edit_lock_ = true
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Vectorscope" unique_id=1540043901]
+bus = &"Player"
 
 [node name="VectorscopeSubViewportContainer" type="SubViewportContainer" parent="Vectorscope" unique_id=784740499 node_paths=PackedStringArray("sub_viewport")]
 layout_mode = 1
@@ -60,13 +61,14 @@ disable_3d = true
 handle_input_locally = false
 size = Vector2i(1152, 648)
 render_target_clear_mode = 1
+render_target_update_mode = 4
 
 [node name="Drawer" type="Node2D" parent="Vectorscope/VectorscopeSubViewportContainer/SubViewport" unique_id=2036080093]
 script = ExtResource("4_tbgi4")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=499037899]
 
-[node name="MarginContainer" type="MarginContainer" parent="UI" unique_id=25295232 node_paths=PackedStringArray("volume_label", "volume_slider", "loopback_button", "persistence_slider", "penalty_slider", "pan_control", "speed_control", "seek_slider")]
+[node name="MarginContainer" type="MarginContainer" parent="UI" unique_id=25295232 node_paths=PackedStringArray("volume_label", "volume_slider", "loopback_button", "loopback_error_label", "persistence_slider", "penalty_slider", "pan_control", "speed_control", "seek_slider")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -80,6 +82,7 @@ script = ExtResource("3_lpaer")
 volume_label = NodePath("VBoxContainer/HBoxContainer/Volume/Control/Label")
 volume_slider = NodePath("VBoxContainer/HBoxContainer/Volume/VSlider")
 loopback_button = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Loopback/HBoxContainer/CheckButton")
+loopback_error_label = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Loopback/HBoxContainer/ErrorLabel")
 persistence_slider = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Persistence/HSlider")
 penalty_slider = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Penalty/HSlider")
 pan_control = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Pan")
@@ -116,14 +119,11 @@ text = "Volume"
 
 [node name="VSlider" type="VSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/Volume" unique_id=593845710]
 layout_mode = 2
-tooltip_text = "Linear amplitude/scale of the audio/plot"
+tooltip_text = "Volume/scale of the audio/plot"
 focus_mode = 0
 mouse_default_cursor_shape = 16
-min_value = 0.1
-max_value = 8.0
-step = 0.1
-value = 2.0
-exp_edit = true
+min_value = -20.0
+max_value = 20.0
 allow_greater = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer/HBoxContainer" unique_id=2072327174]
@@ -149,10 +149,12 @@ focus_mode = 0
 mouse_default_cursor_shape = 16
 
 [node name="ErrorLabel" type="Label" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Loopback/HBoxContainer" unique_id=396121547]
+custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_colors/font_color = Color(1, 0, 0, 1)
-text = "Error"
+text = "Can't open audio device for loopback"
+autowrap_mode = 3
 
 [node name="AntiAliasing" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=704622324]
 layout_mode = 2

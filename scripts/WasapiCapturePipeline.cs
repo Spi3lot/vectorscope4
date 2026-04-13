@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Buffers;
 using System.IO.Pipelines;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Godot;
 
@@ -9,22 +11,38 @@ using NAudio.Wave;
 
 namespace Vectorscope.Scripts;
 
-public class WaveProcessor
+public class WasapiCapturePipeline
 {
 
-    public Pipe Pipe { get; } = new(new PipeOptions(pauseWriterThreshold: 0, resumeWriterThreshold: 0));
+    private static readonly PipeOptions PipeOptions = new(pauseWriterThreshold: 0, resumeWriterThreshold: 0);
+
+    private readonly Pipe _pipe = new(PipeOptions);
+
+    public double BufferLength { get; set; } = 0.1;
 
     public WaveFormat WaveFormat { get; set; }
 
+    public void Reset()
+    {
+        _pipe.Writer.Complete();
+        _pipe.Reader.Complete();
+        _pipe.Reset();
+    }
+
+    public ValueTask<FlushResult> WriteAsync(WaveInEventArgs args, CancellationToken cancellationToken)
+    {
+        return _pipe.Writer.WriteAsync(args.Buffer.AsMemory(0, args.BytesRecorded), cancellationToken);
+    }
+
     public int GetFramesAvailable()
     {
-        if (!Pipe.Reader.TryRead(out var result))
+        if (!_pipe.Reader.TryRead(out var result))
         {
             return 0;
         }
 
         int available = (int) (result.Buffer.Length / WaveFormat.BlockAlign);
-        Pipe.Reader.AdvanceTo(result.Buffer.Start, result.Buffer.Start);
+        _pipe.Reader.AdvanceTo(result.Buffer.Start, result.Buffer.Start);
         return available;
     }
 
@@ -51,26 +69,40 @@ public class WaveProcessor
     /// </returns>
     public Vector2[] ReadStereo(int requestedFrameCount, float scale = 1)
     {
-        if (!Pipe.Reader.TryRead(out var result))
+        if (!_pipe.Reader.TryRead(out var result))
         {
             return [];
         }
 
-        if (result.Buffer.Length < requestedFrameCount * WaveFormat.BlockAlign)
+        long requestedByteCount = requestedFrameCount * WaveFormat.BlockAlign;
+
+        if (result.Buffer.Length < requestedByteCount)
         {
-            Pipe.Reader.AdvanceTo(result.Buffer.Start, result.Buffer.End);
+            _pipe.Reader.AdvanceTo(result.Buffer.Start, result.Buffer.End);
             return [];
         }
 
         var reader = new SequenceReader<byte>(result.Buffer);
         var vectors = new Vector2[requestedFrameCount];
+        long maxBytesAllowed = long.Max(requestedByteCount, (long) (BufferLength * WaveFormat.AverageBytesPerSecond));
+        long excess = result.Buffer.Length - maxBytesAllowed;
+
+        if (excess > 0)
+        {
+            long skip = excess - excess % WaveFormat.BlockAlign;
+
+            if (skip > 0)
+            {
+                reader.Advance(skip);
+            }
+        }
 
         for (int i = 0; i < requestedFrameCount; i++)
         {
             vectors[i] = scale * ReadStereoFrame(ref reader);
         }
 
-        Pipe.Reader.AdvanceTo(reader.Position);
+        _pipe.Reader.AdvanceTo(reader.Position);
         return vectors;
     }
 

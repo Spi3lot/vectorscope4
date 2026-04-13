@@ -11,9 +11,7 @@ namespace Vectorscope.Scripts;
 public partial class WasapiLoopbackRecorder : Node
 {
 
-    private readonly SemaphoreSlim _writeSemaphore = new(1, 1);
-
-    private readonly WaveProcessor _waveProcessor = new();
+    private readonly WasapiCapturePipeline _pipeline = new();
 
     private WasapiLoopbackCapture _capture;
 
@@ -21,11 +19,17 @@ public partial class WasapiLoopbackRecorder : Node
 
     public float Scale { get; set; } = 1;
 
-    public double SampleRate => _waveProcessor.WaveFormat.SampleRate;
+    public double BufferLength
+    {
+        get => _pipeline.BufferLength;
+        set => _pipeline.BufferLength = value;
+    }
 
-    public int GetFramesAvailable() => _waveProcessor.GetFramesAvailable();
+    public double SampleRate => _pipeline.WaveFormat.SampleRate;
 
-    public Vector2[] GetBuffer(int frames) => _waveProcessor.ReadStereo(frames, Scale);
+    public int GetFramesAvailable() => _pipeline.GetFramesAvailable();
+
+    public Vector2[] GetBuffer(int frames) => _pipeline.ReadStereo(frames, Scale);
 
     public Error SetRecording(bool value)
     {
@@ -44,14 +48,20 @@ public partial class WasapiLoopbackRecorder : Node
     {
         try
         {
-            _capture = new WasapiLoopbackCapture();
+            _capture = new WasapiLoopbackCapture(); // Reinitialize on every start to update used audio output device
         }
         catch (COMException ex) when (ex.HResult == unchecked((int) 0x80070490)) // E_ELEMENT_NOT_FOUND
         {
             return Error.CantOpen;
         }
 
-        _waveProcessor.WaveFormat = _capture.WaveFormat;
+        _pipeline.WaveFormat = _capture.WaveFormat;
+
+        if (_pipeline.WaveFormat.Encoding != WaveFormatEncoding.IeeeFloat)
+        {
+            return Error.CantResolve;
+        }
+
         _cts = new CancellationTokenSource();
         _capture.RecordingStopped += RecordingStopped;
         _capture.DataAvailable += DataAvailable;
@@ -63,9 +73,7 @@ public partial class WasapiLoopbackRecorder : Node
     {
         _capture?.Dispose();
         _capture = null;
-        _waveProcessor.Pipe.Writer.Complete();
-        _waveProcessor.Pipe.Reader.Complete();
-        _waveProcessor.Pipe.Reset();
+        _pipeline.Reset();
         return Error.Ok;
     }
 
@@ -90,16 +98,9 @@ public partial class WasapiLoopbackRecorder : Node
 
     private async void DataAvailable(object sender, WaveInEventArgs args)
     {
-        bool semaphoreAcquired = false;
-
         try
         {
-            await _writeSemaphore.WaitAsync(_cts.Token);
-            semaphoreAcquired = true;
-
-            await _waveProcessor.Pipe.Writer.WriteAsync(
-                args.Buffer.AsMemory(0, args.BytesRecorded),
-                _cts.Token);
+            await _pipeline.WriteAsync(args, _cts.Token);
         }
         catch (OperationCanceledException)
         {
@@ -108,13 +109,6 @@ public partial class WasapiLoopbackRecorder : Node
         catch (Exception ex)
         {
             GD.PushError(ex.ToString());
-        }
-        finally
-        {
-            if (semaphoreAcquired)
-            {
-                _writeSemaphore.Release();
-            }
         }
     }
 
