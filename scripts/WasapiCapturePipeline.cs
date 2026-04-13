@@ -11,7 +11,7 @@ using NAudio.Wave;
 
 namespace Vectorscope.Scripts;
 
-public class WaveProcessor
+public class WasapiCapturePipeline
 {
 
     private static readonly PipeOptions PipeOptions = new(pauseWriterThreshold: 0, resumeWriterThreshold: 0);

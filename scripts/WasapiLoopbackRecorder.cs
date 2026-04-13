@@ -11,7 +11,7 @@ namespace Vectorscope.Scripts;
 public partial class WasapiLoopbackRecorder : Node
 {
 
-    private readonly WaveProcessor _waveProcessor = new();
+    private readonly WasapiCapturePipeline _pipeline = new();
 
     private WasapiLoopbackCapture _capture;
 
@@ -21,15 +21,15 @@ public partial class WasapiLoopbackRecorder : Node
 
     public double BufferLength
     {
-        get => _waveProcessor.BufferLength;
-        set => _waveProcessor.BufferLength = value;
+        get => _pipeline.BufferLength;
+        set => _pipeline.BufferLength = value;
     }
 
-    public double SampleRate => _waveProcessor.WaveFormat.SampleRate;
+    public double SampleRate => _pipeline.WaveFormat.SampleRate;
 
-    public int GetFramesAvailable() => _waveProcessor.GetFramesAvailable();
+    public int GetFramesAvailable() => _pipeline.GetFramesAvailable();
 
-    public Vector2[] GetBuffer(int frames) => _waveProcessor.ReadStereo(frames, Scale);
+    public Vector2[] GetBuffer(int frames) => _pipeline.ReadStereo(frames, Scale);
 
     public Error SetRecording(bool value)
     {
@@ -55,9 +55,9 @@ public partial class WasapiLoopbackRecorder : Node
             return Error.CantOpen;
         }
 
-        _waveProcessor.WaveFormat = _capture.WaveFormat;
+        _pipeline.WaveFormat = _capture.WaveFormat;
 
-        if (_waveProcessor.WaveFormat.Encoding != WaveFormatEncoding.IeeeFloat)
+        if (_pipeline.WaveFormat.Encoding != WaveFormatEncoding.IeeeFloat)
         {
             return Error.CantResolve;
         }
@@ -73,7 +73,7 @@ public partial class WasapiLoopbackRecorder : Node
     {
         _capture?.Dispose();
         _capture = null;
-        _waveProcessor.Reset();
+        _pipeline.Reset();
         return Error.Ok;
     }
 
@@ -100,7 +100,7 @@ public partial class WasapiLoopbackRecorder : Node
     {
         try
         {
-            await _waveProcessor.WriteAsync(args, _cts.Token);
+            await _pipeline.WriteAsync(args, _cts.Token);
         }
         catch (OperationCanceledException)
         {
