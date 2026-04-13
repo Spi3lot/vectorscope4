@@ -81,8 +81,8 @@ func _on_loopback_toggled(toggled_on: bool) -> void:
     loopback_error_label.text = _get_error_text(error)
 
     if error != OK:
-        toggled_on = not toggled_on
-        loopback_button.set_pressed_no_signal(toggled_on)
+        loopback_button.set_pressed_no_signal(not toggled_on)
+        return
 
     pan_control.visible = not toggled_on
     speed_control.visible = not toggled_on
