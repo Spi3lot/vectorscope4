@@ -14,6 +14,8 @@ public class WaveProcessor
 
     public Pipe Pipe { get; } = new(new PipeOptions(pauseWriterThreshold: 0, resumeWriterThreshold: 0));
 
+    public double BufferLength { get; set; } = 0.1;
+
     public WaveFormat WaveFormat { get; set; }
 
     public int GetFramesAvailable()
@@ -56,7 +58,9 @@ public class WaveProcessor
             return [];
         }
 
-        if (result.Buffer.Length < requestedFrameCount * WaveFormat.BlockAlign)
+        long requestedByteCount = requestedFrameCount * WaveFormat.BlockAlign;
+
+        if (result.Buffer.Length < requestedByteCount)
         {
             Pipe.Reader.AdvanceTo(result.Buffer.Start, result.Buffer.End);
             return [];
@@ -64,6 +68,18 @@ public class WaveProcessor
 
         var reader = new SequenceReader<byte>(result.Buffer);
         var vectors = new Vector2[requestedFrameCount];
+        long maxBytesAllowed = long.Max(requestedByteCount, (long) (BufferLength * WaveFormat.AverageBytesPerSecond));
+        long excess = result.Buffer.Length - maxBytesAllowed;
+
+        if (excess > 0)
+        {
+            long skip = excess - excess % WaveFormat.BlockAlign;
+
+            if (skip > 0)
+            {
+                reader.Advance(skip);
+            }
+        }
 
         for (int i = 0; i < requestedFrameCount; i++)
         {

@@ -12,11 +12,6 @@ var line_whites := PackedColorArray()
 var time_multiplier: float
 var sample_rate: float
 
-@onready var capture: AudioEffectCapture = AudioServer.get_bus_effect(
-    %Vectorscope.bus_idx,
-    AudioServer.get_bus_effect_count(%Vectorscope.bus_idx) - 1
-)
-
 func _process(delta: float) -> void:
     if not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused:
         return
@@ -34,9 +29,9 @@ func _process(delta: float) -> void:
     else:
         time_multiplier = %Vectorscope.audio_player.pitch_scale
         sample_rate = AudioServer.get_mix_rate() * _get_stereo_channel_count()
-        var available: int = capture.get_frames_available()
+        var available: int = %Vectorscope.capture.get_frames_available()
         var size: int = _optimal_frame_buffer_size(delta, available)
-        frame_buffer = capture.get_buffer(size)
+        frame_buffer = %Vectorscope.capture.get_buffer(size)
 
     if len(frame_buffer) > 0:
         _update_line_properties(previous_frame)

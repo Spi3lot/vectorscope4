@@ -21,6 +21,12 @@ public partial class WasapiLoopbackRecorder : Node
 
     public float Scale { get; set; } = 1;
 
+    public double BufferLength
+    {
+        get => _waveProcessor.BufferLength;
+        set => _waveProcessor.BufferLength = value;
+    }
+
     public double SampleRate => _waveProcessor.WaveFormat.SampleRate;
 
     public int GetFramesAvailable() => _waveProcessor.GetFramesAvailable();

@@ -1,7 +1,13 @@
+@tool
 extends Control
 class_name Vectorscope
 
 @export_group("Configuration")
+@export_range(0.01, 10.0, 0.01) var buffer_length := 0.1:
+    set(value):
+        buffer_length = value
+        if capture: capture.buffer_length = value
+
 @export var loopback := true:
     set(value):
         loopback = value
@@ -31,15 +37,20 @@ class_name Vectorscope
 @export var audio_player: AudioStreamPlayer
 @export var sub_viewport_container: FixedSubViewportContainer
 
-var bus_idx := AudioServer.get_bus_index(&"Player")
+@onready var bus_idx := AudioServer.get_bus_index(&"Player")
+@onready var capture: AudioEffectCapture = AudioServer.get_bus_effect(bus_idx, AudioServer.get_bus_effect_count(bus_idx) - 1)
 
 func _ready() -> void:
+    if Engine.is_editor_hint():
+        return
+
+    WasapiLoopbackRecorder.BufferLength = buffer_length
     audio_player.finished.connect(_select_file)
     %FileDialog.file_selected.connect(_on_file_selected)
     
 
 func _input(event: InputEvent) -> void:
-    if event is not InputEventKey or not event.pressed or event.echo:
+    if event is not InputEventKey or not event.pressed or event.echo or Engine.is_editor_hint():
         return
     
     match event.keycode:
