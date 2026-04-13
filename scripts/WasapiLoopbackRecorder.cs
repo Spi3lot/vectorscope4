@@ -73,9 +73,7 @@ public partial class WasapiLoopbackRecorder : Node
     {
         _capture?.Dispose();
         _capture = null;
-        _waveProcessor.Pipe.Writer.Complete();
-        _waveProcessor.Pipe.Reader.Complete();
-        _waveProcessor.Pipe.Reset();
+        _waveProcessor.Reset();
         return Error.Ok;
     }
 
@@ -102,9 +100,7 @@ public partial class WasapiLoopbackRecorder : Node
     {
         try
         {
-            await _waveProcessor.Pipe.Writer.WriteAsync(
-                args.Buffer.AsMemory(0, args.BytesRecorded),
-                _cts.Token);
+            await _waveProcessor.WriteAsync(args, _cts.Token);
         }
         catch (OperationCanceledException)
         {
