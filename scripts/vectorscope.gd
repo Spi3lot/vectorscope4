@@ -37,6 +37,7 @@ class_name Vectorscope
 @export var audio_player: AudioStreamPlayer
 @export var sub_viewport_container: FixedSubViewportContainer
 
+const ZOOM_FACTOR := 1.25
 const MAX_ZOOM := 64.0
 const MAX_SCALE := Vector2(MAX_ZOOM, MAX_ZOOM)
 
@@ -75,9 +76,9 @@ func _handle_input_event_mouse_button(event: InputEventMouseButton) -> void:
         sub_viewport_container.position += (new_pivot - old_pivot) * (sub_viewport_container.scale - Vector2.ONE)
 
         if event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_UP:
-            sub_viewport_container.scale *= 1.5
+            sub_viewport_container.scale *= ZOOM_FACTOR
         elif event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_DOWN:
-            sub_viewport_container.scale /= 1.5
+            sub_viewport_container.scale /= ZOOM_FACTOR
 
         sub_viewport_container.scale = sub_viewport_container.scale.clamp(Vector2.ONE, MAX_SCALE)
 
