@@ -10,12 +10,20 @@ var frame_buffer := PackedVector2Array()
 var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
 var line_whites := PackedColorArray()
+var paused := false
+
 var time_multiplier: float
 var sample_rate: float
 
 func _process(delta: float) -> void:
     if (%Vectorscope.loopback and WasapiLoopbackRecorder.Paused) or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
+        if not paused:
+            paused = true
+            queue_redraw()
+
         return
+
+    paused = false
 
     var previous_frame := Vector2.ZERO \
         if frame_buffer.is_empty() \
@@ -40,6 +48,9 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
+    if paused:
+        return
+
     _draw_fade_rect()
     _draw_multilines()
 
