@@ -37,6 +37,9 @@ class_name Vectorscope
 @export var audio_player: AudioStreamPlayer
 @export var sub_viewport_container: FixedSubViewportContainer
 
+const MAX_ZOOM := 64.0
+const MAX_SCALE := Vector2(MAX_ZOOM, MAX_ZOOM)
+
 @onready var bus_idx := AudioServer.get_bus_index(&"Player")
 @onready var capture_idx := AudioServer.get_bus_effect_count(bus_idx) - 1
 @onready var capture: AudioEffectCapture = AudioServer.get_bus_effect(bus_idx, capture_idx)
@@ -48,12 +51,41 @@ func _ready() -> void:
     WasapiLoopbackRecorder.BufferLength = buffer_length
     audio_player.finished.connect(_select_file)
     %FileDialog.file_selected.connect(_on_file_selected)
-    
 
-func _input(event: InputEvent) -> void:
-    if event is not InputEventKey or not event.pressed or event.echo or Engine.is_editor_hint():
+
+# TODO: Set mouse_filter to stop
+func _unhandled_input(event: InputEvent) -> void:
+    if Engine.is_editor_hint():
         return
-    
+
+    if event is InputEventMouseButton and event.pressed:
+        if event.button_index in [MouseButton.MOUSE_BUTTON_WHEEL_UP, MouseButton.MOUSE_BUTTON_WHEEL_DOWN]:
+            var old_pivot := sub_viewport_container.pivot_offset
+            var new_pivot := sub_viewport_container.get_local_mouse_position()
+            sub_viewport_container.pivot_offset = new_pivot
+            sub_viewport_container.position += (new_pivot - old_pivot) * (sub_viewport_container.scale - Vector2.ONE)
+
+            if event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_UP:
+                sub_viewport_container.scale *= 1.5
+            elif event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_DOWN:
+                sub_viewport_container.scale /= 1.5
+
+            sub_viewport_container.scale = sub_viewport_container.scale.clamp(Vector2.ONE, MAX_SCALE)
+
+            if sub_viewport_container.scale.is_equal_approx(Vector2.ONE):
+                sub_viewport_container.pivot_offset = Vector2.ZERO
+                sub_viewport_container.position = Vector2.ZERO
+        elif event.button_index in [MouseButton.MOUSE_BUTTON_WHEEL_LEFT, MouseButton.MOUSE_BUTTON_WHEEL_RIGHT]:
+            if event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_LEFT:
+                pass
+            elif event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_RIGHT:
+                pass
+
+        return
+
+    if event is not InputEventKey or not event.pressed or event.echo:
+        return
+
     match event.keycode:
         KEY_SPACE:
             if loopback:
@@ -69,7 +101,7 @@ func _on_file_selected(path: String) -> void:
     audio_player.stream = AudioLoader.loadfile(path)
     audio_player.play()
     AudioServer.set_bus_effect_enabled(bus_idx, capture_idx, true)
-    
+
 
 func _select_file() -> void:
     %FileDialog.visible = true
