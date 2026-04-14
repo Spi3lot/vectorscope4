@@ -55,9 +55,12 @@ func _input(event: InputEvent) -> void:
         return
     
     match event.keycode:
-        KEY_SPACE when not loopback:
-            AudioServer.set_bus_effect_enabled(bus_idx, capture_idx, audio_player.stream_paused)
-            audio_player.stream_paused = not audio_player.stream_paused
+        KEY_SPACE:
+            if loopback:
+                WasapiLoopbackRecorder.TogglePaused()
+            else:
+                AudioServer.set_bus_effect_enabled(bus_idx, capture_idx, audio_player.stream_paused)
+                audio_player.stream_paused = not audio_player.stream_paused
         KEY_ESCAPE when not loopback and not %FileDialog.visible:
             _select_file()
 

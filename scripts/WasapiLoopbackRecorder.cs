@@ -4,6 +4,7 @@ using System.Threading;
 
 using Godot;
 
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
 
 namespace Vectorscope.Scripts;
@@ -16,6 +17,8 @@ public partial class WasapiLoopbackRecorder : Node
     private WasapiLoopbackCapture _capture;
 
     private CancellationTokenSource _cts;
+
+    public bool Paused => _capture.CaptureState == CaptureState.Stopped;
 
     public float Scale { get; set; } = 1;
 
@@ -30,6 +33,19 @@ public partial class WasapiLoopbackRecorder : Node
     public int GetFramesAvailable() => _pipeline.GetFramesAvailable();
 
     public Vector2[] GetBuffer(int frames) => _pipeline.ReadStereo(frames, Scale);
+
+    public void TogglePaused()
+    {
+        if (Paused)
+        {
+            _cts = new CancellationTokenSource();
+            _capture.StartRecording();
+        }
+        else
+        {
+            _capture.StopRecording();
+        }
+    }
 
     public Error SetRecording(bool value)
     {
