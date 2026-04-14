@@ -54,7 +54,6 @@ func _ready() -> void:
     %FileDialog.file_selected.connect(_on_file_selected)
 
 
-# TODO: Set mouse_filter to stop
 func _unhandled_input(event: InputEvent) -> void:
     if Engine.is_editor_hint():
         return

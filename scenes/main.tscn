@@ -145,7 +145,6 @@ size_flags_horizontal = 0
 layout_mode = 2
 size_flags_horizontal = 0
 tooltip_text = "Whether to capture all currently replayed audio or play a specific audio file"
-focus_mode = 0
 mouse_default_cursor_shape = 16
 
 [node name="ErrorLabel" type="Label" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Loopback/HBoxContainer" unique_id=396121547]
@@ -167,7 +166,6 @@ text = "Line Antialiasing"
 layout_mode = 2
 size_flags_horizontal = 0
 tooltip_text = "Whether to antialias lines or not"
-focus_mode = 0
 mouse_default_cursor_shape = 16
 button_pressed = true
 
@@ -181,7 +179,7 @@ text = "Line Width"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Width" unique_id=1904914006]
 layout_mode = 2
 tooltip_text = "How wide each line appears"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 min_value = 1.0
 max_value = 10.0
@@ -197,7 +195,7 @@ text = "Line Glow"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Glow" unique_id=1746482621]
 layout_mode = 2
 tooltip_text = "How bright each line appears"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 max_value = 1.0
 step = 0.05
@@ -213,7 +211,7 @@ text = "Line Penalty"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Penalty" unique_id=573996884]
 layout_mode = 2
 tooltip_text = "Factor that scales the darkness of a line based on its length"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 value = 20.0
 
@@ -227,7 +225,7 @@ text = "Persistence"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Persistence" unique_id=219106689]
 layout_mode = 2
 tooltip_text = "Lifetime of each drawn frame of lines"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 max_value = 1.0
 step = 0.01
@@ -243,7 +241,7 @@ text = "Pan"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Pan" unique_id=1926006206]
 layout_mode = 2
 tooltip_text = "Panning of the stereo audio from left to right and inbetween"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 min_value = -1.0
 max_value = 1.0
@@ -259,7 +257,7 @@ text = "Speed / Pitch"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Speed" unique_id=1235202381]
 layout_mode = 2
 tooltip_text = "Multiplier for the song speed and pitch"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 min_value = 0.01
 max_value = 4.0
@@ -281,6 +279,7 @@ presets_visible = false
 layout_mode = 2
 size_flags_vertical = 10
 focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 2
 max_value = 1.0
 step = 0.001
