@@ -12,7 +12,7 @@ class_name Vectorscope
     set(value):
         loopback = value
         audio_player.stream = null
-        %FileDialog.visible = not loopback
+        %FileDialog.visible = not (loopback or Engine.is_editor_hint())
 
 @export var line_antialiasing := true:
     set(value):
