@@ -59,33 +59,39 @@ func _unhandled_input(event: InputEvent) -> void:
         return
 
     if event is InputEventMouseButton and event.pressed:
-        if event.button_index in [MouseButton.MOUSE_BUTTON_WHEEL_UP, MouseButton.MOUSE_BUTTON_WHEEL_DOWN]:
-            var old_pivot := sub_viewport_container.pivot_offset
-            var new_pivot := sub_viewport_container.get_local_mouse_position()
-            sub_viewport_container.pivot_offset = new_pivot
-            sub_viewport_container.position += (new_pivot - old_pivot) * (sub_viewport_container.scale - Vector2.ONE)
-
-            if event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_UP:
-                sub_viewport_container.scale *= 1.5
-            elif event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_DOWN:
-                sub_viewport_container.scale /= 1.5
-
-            sub_viewport_container.scale = sub_viewport_container.scale.clamp(Vector2.ONE, MAX_SCALE)
-
-            if sub_viewport_container.scale.is_equal_approx(Vector2.ONE):
-                sub_viewport_container.pivot_offset = Vector2.ZERO
-                sub_viewport_container.position = Vector2.ZERO
-        elif event.button_index in [MouseButton.MOUSE_BUTTON_WHEEL_LEFT, MouseButton.MOUSE_BUTTON_WHEEL_RIGHT]:
-            if event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_LEFT:
-                pass
-            elif event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_RIGHT:
-                pass
-
+        _handle_input_event_mouse_button(event)
         return
 
-    if event is not InputEventKey or not event.pressed or event.echo:
+    if event is InputEventKey and event.pressed and not event.echo:
+        _handle_input_event_key(event)
         return
 
+
+func _handle_input_event_mouse_button(event: InputEventMouseButton) -> void:
+    if event.button_index in [MouseButton.MOUSE_BUTTON_WHEEL_UP, MouseButton.MOUSE_BUTTON_WHEEL_DOWN]:
+        var old_pivot := sub_viewport_container.pivot_offset
+        var new_pivot := sub_viewport_container.get_local_mouse_position()
+        sub_viewport_container.pivot_offset = new_pivot
+        sub_viewport_container.position += (new_pivot - old_pivot) * (sub_viewport_container.scale - Vector2.ONE)
+
+        if event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_UP:
+            sub_viewport_container.scale *= 1.5
+        elif event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_DOWN:
+            sub_viewport_container.scale /= 1.5
+
+        sub_viewport_container.scale = sub_viewport_container.scale.clamp(Vector2.ONE, MAX_SCALE)
+
+        if sub_viewport_container.scale.is_equal_approx(Vector2.ONE):
+            sub_viewport_container.pivot_offset = Vector2.ZERO
+            sub_viewport_container.position = Vector2.ZERO
+    elif event.button_index in [MouseButton.MOUSE_BUTTON_WHEEL_LEFT, MouseButton.MOUSE_BUTTON_WHEEL_RIGHT]:
+        if event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_LEFT:
+            pass
+        elif event.button_index == MouseButton.MOUSE_BUTTON_WHEEL_RIGHT:
+            pass
+
+
+func _handle_input_event_key(event: InputEventKey) -> void:
     match event.keycode:
         KEY_SPACE:
             if loopback:
