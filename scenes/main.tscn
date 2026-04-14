@@ -62,7 +62,6 @@ handle_input_locally = false
 gui_disable_input = true
 size = Vector2i(1152, 648)
 render_target_clear_mode = 1
-render_target_update_mode = 4
 
 [node name="Drawer" type="Node2D" parent="Vectorscope/VectorscopeSubViewportContainer/SubViewport" unique_id=2036080093]
 script = ExtResource("4_tbgi4")
@@ -121,7 +120,7 @@ text = "Volume"
 [node name="VSlider" type="VSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/Volume" unique_id=593845710]
 layout_mode = 2
 tooltip_text = "Volume/scale of the audio/plot"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 min_value = -20.0
 max_value = 20.0
