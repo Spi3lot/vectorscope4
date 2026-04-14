@@ -51,7 +51,7 @@ func _ready() -> void:
     WasapiLoopbackRecorder.BufferLength = buffer_length
     audio_player.finished.connect(_select_file)
     %FileDialog.file_selected.connect(_on_file_selected)
-    
+
 
 # TODO: Set mouse_filter to stop
 func _unhandled_input(event: InputEvent) -> void:
@@ -85,7 +85,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
     if event is not InputEventKey or not event.pressed or event.echo:
         return
-    
+
     match event.keycode:
         KEY_SPACE:
             if loopback:
@@ -101,7 +101,7 @@ func _on_file_selected(path: String) -> void:
     audio_player.stream = AudioLoader.loadfile(path)
     audio_player.play()
     AudioServer.set_bus_effect_enabled(bus_idx, capture_idx, true)
-    
+
 
 func _select_file() -> void:
     %FileDialog.visible = true
