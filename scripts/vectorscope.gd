@@ -59,6 +59,10 @@ func _unhandled_input(event: InputEvent) -> void:
     if Engine.is_editor_hint():
         return
 
+    if event is InputEventMouseMotion and not is_zero_approx(event.pressure):
+        _handle_input_event_mouse_motion(event)
+        return
+
     if event is InputEventMouseButton and event.pressed:
         _handle_input_event_mouse_button(event)
         return
@@ -66,6 +70,10 @@ func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
         _handle_input_event_key(event)
         return
+
+
+func _handle_input_event_mouse_motion(event: InputEventMouseMotion) -> void:
+    sub_viewport_container.position += event.relative
 
 
 func _handle_input_event_mouse_button(event: InputEventMouseButton) -> void:
