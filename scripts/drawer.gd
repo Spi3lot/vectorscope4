@@ -16,7 +16,7 @@ var time_multiplier: float
 var sample_rate: float
 
 func _process(delta: float) -> void:
-    if %Vectorscope.is_paused():
+    if %Vectorscope.paused:
         if not paused:
             paused = true
             queue_redraw()
@@ -86,7 +86,8 @@ func _frame_to_screen_space(frame: Vector2) -> Vector2:
     frame.y = -frame.y
     var viewport_size: Vector2i = %Vectorscope.sub_viewport_container.sub_viewport.size
     var min_aspect := mini(viewport_size.x, viewport_size.y)
-    return (frame * min_aspect + Vector2(viewport_size)) / 2
+    var screen_pos := (frame * min_aspect + Vector2(viewport_size)) / 2
+    return %Vectorscope.scope_transform * screen_pos
 
 
 func _calc_line_color(previous_frame: Vector2, current_frame: Vector2) -> Color:

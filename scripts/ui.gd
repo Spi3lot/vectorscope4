@@ -25,12 +25,12 @@ func _process(_delta: float) -> void:
 
     if not dragging and player.stream:
         seek_slider.value = player.get_playback_position() / player.stream.get_length()
-    
+
 
 func _on_volume_value_changed(value: float) -> void:
     %Vectorscope.plot_scale = db_to_linear(value)
-    
-    if %Vectorscope.loopback:
+
+    if %Vectorscope.loopback: # TODO: Remove
         WasapiLoopbackRecorder.Scale = %Vectorscope.plot_scale
     else:
         %Vectorscope.audio_player.volume_db = value
@@ -89,7 +89,7 @@ func _on_loopback_toggled(toggled_on: bool) -> void:
     speed_control.visible = not toggled_on
     seek_slider.visible = not toggled_on
     %Vectorscope.loopback = toggled_on
-    
+
     if toggled_on:
         volume_slider.value = linear_to_db(WasapiLoopbackRecorder.Scale)
         volume_label.text = "Scale"
