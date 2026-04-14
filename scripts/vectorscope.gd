@@ -124,3 +124,8 @@ func _select_file() -> void:
 func _optimize_line_width() -> void:
     if not line_antialiasing and is_equal_approx(line_width, 1.0):
         line_width = -1.0
+
+
+func is_paused() -> bool:
+    return (%Vectorscope.loopback and WasapiLoopbackRecorder.Paused) \
+        or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused)

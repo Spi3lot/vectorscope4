@@ -16,7 +16,7 @@ var time_multiplier: float
 var sample_rate: float
 
 func _process(delta: float) -> void:
-    if (%Vectorscope.loopback and WasapiLoopbackRecorder.Paused) or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
+    if %Vectorscope.is_paused():
         if not paused:
             paused = true
             queue_redraw()
