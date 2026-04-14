@@ -3,8 +3,9 @@ extends Node2D
 # 0.1 means we consume the dt amount + 10% of the backlog (=> backlog decays exponentially).
 # 10% feels safer to me than e.g. 25% as that increases the
 # backlog's half-life from ~2 frames to ~6 frames which leaves more room for high fps
-const CATCH_UP_SPEED: float = 0.1
+const CATCH_UP_SPEED := 0.1
 const SQRT_8 := sqrt(8.0)
+
 var frame_buffer := PackedVector2Array()
 var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
