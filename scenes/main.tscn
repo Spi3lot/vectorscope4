@@ -59,6 +59,7 @@ metadata/_edit_lock_ = true
 [node name="SubViewport" type="SubViewport" parent="Vectorscope/VectorscopeSubViewportContainer" unique_id=1193102148]
 disable_3d = true
 handle_input_locally = false
+gui_disable_input = true
 size = Vector2i(1152, 648)
 render_target_clear_mode = 1
 render_target_update_mode = 4
