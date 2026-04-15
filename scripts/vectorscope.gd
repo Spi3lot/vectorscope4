@@ -84,25 +84,9 @@ func _handle_input_event_mouse_motion(event: InputEventMouseMotion) -> void:
 
 func _handle_input_event_mouse_button(event: InputEventMouseButton) -> void:
     match event.button_index:
-        MOUSE_BUTTON_WHEEL_UP, \
-        MOUSE_BUTTON_WHEEL_DOWN:
-            var zoom_multiplier := ZOOM_FACTOR if event.button_index == MOUSE_BUTTON_WHEEL_UP else (1.0 / ZOOM_FACTOR)
-            var mouse_pos := sub_viewport_container.get_local_mouse_position()
-
-            if paused:
-                var old_pivot := sub_viewport_container.pivot_offset
-                sub_viewport_container.pivot_offset = mouse_pos
-                sub_viewport_container.position += (mouse_pos - old_pivot) * (sub_viewport_container.scale - Vector2.ONE)
-                sub_viewport_container.scale = MAX_SCALE.min(sub_viewport_container.scale * zoom_multiplier)
-            else:
-                var trans := Transform2D() \
-                    .translated(-mouse_pos) \
-                    .scaled(Vector2(zoom_multiplier, zoom_multiplier)) \
-                    .translated(mouse_pos)
-    
-                vector_transform = trans * vector_transform
-        MOUSE_BUTTON_MIDDLE:
-            _reset_zoom()
+        MouseButton.MOUSE_BUTTON_WHEEL_UP: _apply_zoom(ZOOM_FACTOR)
+        MouseButton.MOUSE_BUTTON_WHEEL_DOWN: _apply_zoom(1.0 / ZOOM_FACTOR)
+        MouseButton.MOUSE_BUTTON_MIDDLE: _reset_zoom()
 
 
 func _handle_input_event_key(event: InputEventKey) -> void:
@@ -119,6 +103,23 @@ func _handle_input_event_key(event: InputEventKey) -> void:
             _select_file()
         KEY_R:
             _reset_zoom()
+
+
+func _apply_zoom(multiplier: float) -> void:
+    var mouse_pos := sub_viewport_container.get_local_mouse_position()
+
+    if paused:
+        var old_pivot := sub_viewport_container.pivot_offset
+        sub_viewport_container.pivot_offset = mouse_pos
+        sub_viewport_container.position += (mouse_pos - old_pivot) * (sub_viewport_container.scale - Vector2.ONE)
+        sub_viewport_container.scale = MAX_SCALE.min(sub_viewport_container.scale * multiplier)
+    else:
+        var trans := Transform2D() \
+            .translated(-mouse_pos) \
+            .scaled(Vector2(multiplier, multiplier)) \
+            .translated(mouse_pos)
+
+        vector_transform = trans * vector_transform
 
 
 func _reset_zoom() -> void:
