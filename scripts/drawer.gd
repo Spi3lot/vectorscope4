@@ -85,8 +85,8 @@ func _update_line_properties(previous_frame: Vector2) -> void:
 func _frame_to_screen_space(frame: Vector2) -> Vector2:
     frame.y = -frame.y
     var viewport_size: Vector2i = %Vectorscope.sub_viewport_container.sub_viewport.size
-    var min_aspect := mini(viewport_size.x, viewport_size.y)
-    var screen_pos := (frame * min_aspect + Vector2(viewport_size)) / 2
+    var min_aspect: int = mini(viewport_size.x, viewport_size.y)
+    var screen_pos: Vector2 = (frame * (min_aspect / %Vectorscope.plot_scale) + Vector2(viewport_size)) / 2
     return %Vectorscope.vector_transform * screen_pos
 
 
