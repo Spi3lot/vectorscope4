@@ -68,16 +68,11 @@ func _unhandled_input(event: InputEvent) -> void:
         return
 
     if event is InputEventMouseMotion and not is_zero_approx(event.pressure):
-        _handle_input_event_mouse_motion(event as InputEventMouseMotion)
-        return
-
-    if event is InputEventMouseButton and event.pressed:
-        _handle_input_event_mouse_button(event as InputEventMouseButton)
-        return
-
-    if event is InputEventKey and event.pressed and not event.echo:
-        _handle_input_event_key(event as InputEventKey)
-        return
+        _handle_input_event_mouse_motion(event)
+    elif event is InputEventMouseButton and event.pressed:
+        _handle_input_event_mouse_button(event)
+    elif event is InputEventKey and event.pressed and not event.echo:
+        _handle_input_event_key(event)
 
 
 func _handle_input_event_mouse_motion(event: InputEventMouseMotion) -> void:
