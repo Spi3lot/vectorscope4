@@ -107,6 +107,8 @@ func _handle_input_event_mouse_button(event: InputEventMouseButton) -> void:
                 .translated(mouse_pos)
 
             vector_transform = trans * vector_transform
+    elif event.button_index == MouseButton.MOUSE_BUTTON_MIDDLE:
+        _reset_zoom()
 
 
 func _handle_input_event_key(event: InputEventKey) -> void:
@@ -121,6 +123,18 @@ func _handle_input_event_key(event: InputEventKey) -> void:
                 audio_player.stream_paused = not audio_player.stream_paused
         KEY_ESCAPE when not loopback and not %FileDialog.visible:
             _select_file()
+        KEY_R:
+            _reset_zoom()
+
+
+func _reset_zoom() -> void:
+    if paused:
+        var inv := vector_transform.affine_inverse()
+        sub_viewport_container.position = inv.origin
+        sub_viewport_container.pivot_offset = Vector2.ZERO
+        sub_viewport_container.scale = inv.get_scale()
+    else:
+        vector_transform = Transform2D.IDENTITY
 
 
 func _bake_raster_to_vector() -> void:
