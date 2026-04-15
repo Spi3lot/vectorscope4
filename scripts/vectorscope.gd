@@ -41,7 +41,7 @@ const ZOOM_FACTOR := 1.25
 const MAX_ZOOM := 64.0
 const MAX_SCALE := Vector2(MAX_ZOOM, MAX_ZOOM)
 
-var scope_transform := Transform2D.IDENTITY
+var vector_transform := Transform2D.IDENTITY
 var paused := false
 
 @onready var bus_idx := AudioServer.get_bus_index(&"Player")
@@ -78,7 +78,7 @@ func _handle_input_event_mouse_motion(event: InputEventMouseMotion) -> void:
     if paused:
         sub_viewport_container.position += event.relative
     else:
-        scope_transform.origin += event.relative
+        vector_transform.origin += event.relative
 
 
 func _handle_input_event_mouse_button(event: InputEventMouseButton) -> void:
@@ -100,7 +100,7 @@ func _handle_input_event_mouse_button(event: InputEventMouseButton) -> void:
                 .scaled(Vector2(zoom_multiplier, zoom_multiplier)) \
                 .translated(mouse_pos)
 
-            scope_transform = trans * scope_transform
+            vector_transform = trans * vector_transform
 
 
 func _handle_input_event_key(event: InputEventKey) -> void:
@@ -121,7 +121,8 @@ func _handle_input_event_key(event: InputEventKey) -> void:
 
 
 func _bake_raster_to_vector() -> void:
-    scope_transform = sub_viewport_container.get_transform() * scope_transform
+    var raster_transform := sub_viewport_container.get_transform()
+    vector_transform = raster_transform * vector_transform
     sub_viewport_container.position = Vector2.ZERO
     sub_viewport_container.pivot_offset = Vector2.ZERO
     sub_viewport_container.scale = Vector2.ONE

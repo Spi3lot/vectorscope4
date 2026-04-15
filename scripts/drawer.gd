@@ -87,7 +87,7 @@ func _frame_to_screen_space(frame: Vector2) -> Vector2:
     var viewport_size: Vector2i = %Vectorscope.sub_viewport_container.sub_viewport.size
     var min_aspect := mini(viewport_size.x, viewport_size.y)
     var screen_pos := (frame * min_aspect + Vector2(viewport_size)) / 2
-    return %Vectorscope.scope_transform * screen_pos
+    return %Vectorscope.vector_transform * screen_pos
 
 
 func _calc_line_color(previous_frame: Vector2, current_frame: Vector2) -> Color:
