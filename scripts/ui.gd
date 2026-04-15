@@ -11,53 +11,55 @@ extends Control
 
 var dragging := false
 
+@onready var vectorscope: Vectorscope = %Vectorscope
+
 func _ready() -> void:
-    loopback_button.button_pressed = %Vectorscope.loopback
-    persistence_slider.value = %Vectorscope.persistence
-    penalty_slider.value = %Vectorscope.length_penalty
+    loopback_button.button_pressed = vectorscope.loopback
+    persistence_slider.value = vectorscope.persistence
+    penalty_slider.value = vectorscope.length_penalty
     get_tree().root.mouse_entered.connect(show)
     get_tree().root.mouse_exited.connect(hide)
 
 
 func _process(_delta: float) -> void:
-    var player: AudioStreamPlayer = %Vectorscope.audio_player
+    var player: AudioStreamPlayer = vectorscope.audio_player
 
     if not dragging and player.stream:
         seek_slider.value = player.get_playback_position() / player.stream.get_length()
 
 
 func _on_volume_value_changed(value: float) -> void:
-    %Vectorscope.audio_player.volume_db = value
-    %Vectorscope.plot_scale = db_to_linear(value)
+    vectorscope.audio_player.volume_db = value
+    vectorscope.plot_scale = db_to_linear(value)
 
 
 func _on_penalty_value_changed(value: float) -> void:
-    %Vectorscope.length_penalty = value
+    vectorscope.length_penalty = value
 
 
 func _on_width_value_changed(value: float) -> void:
-    %Vectorscope.line_width = value
+    vectorscope.line_width = value
 
 
 func _on_glow_value_changed(value: float) -> void:
-    %Vectorscope.line_glow = value
+    vectorscope.line_glow = value
 
 
 func _on_antialiasing_toggled(toggled_on: bool) -> void:
-    %Vectorscope.line_antialiasing = toggled_on
+    vectorscope.line_antialiasing = toggled_on
 
 
 func _on_persistence_value_changed(value: float) -> void:
-    %Vectorscope.persistence = value
+    vectorscope.persistence = value
 
 
 func _on_pan_value_changed(value: float) -> void:
-    var panner: AudioEffectPanner = AudioServer.get_bus_effect(%Vectorscope.bus_idx, 0)
+    var panner: AudioEffectPanner = AudioServer.get_bus_effect(vectorscope.bus_idx, 0)
     panner.pan = value
 
 
 func _on_speed_value_changed(value: float) -> void:
-    %Vectorscope.audio_player.pitch_scale = value
+    vectorscope.audio_player.pitch_scale = value
     
     
 func _on_seek_drag_started() -> void:
@@ -65,9 +67,9 @@ func _on_seek_drag_started() -> void:
 
 
 func _on_seek_drag_ended(value_changed: bool) -> void:
-    if value_changed and %Vectorscope.audio_player.stream:
-        %Vectorscope.audio_player.seek(seek_slider.value * %Vectorscope.audio_player.stream.get_length())
-        %Vectorscope.capture.clear_buffer()
+    if value_changed and vectorscope.audio_player.stream:
+        vectorscope.audio_player.seek(seek_slider.value * vectorscope.audio_player.stream.get_length())
+        vectorscope.capture.clear_buffer()
 
     dragging = false
 
@@ -84,7 +86,7 @@ func _on_loopback_toggled(toggled_on: bool) -> void:
     speed_control.visible = not toggled_on
     volume_control.visible = not toggled_on
     seek_slider.visible = not toggled_on
-    %Vectorscope.loopback = toggled_on
+    vectorscope.loopback = toggled_on
 
 
 func _get_error_text(error: Error) -> String:
