@@ -31,7 +31,6 @@ class_name Vectorscope
 
 @export_range(0.0, 1.0) var line_glow := 0.25
 @export_range(0.0, 100.0) var length_penalty := 20
-@export_range(0.0, 1.0) var plot_scale := 1.0
 @export_range(0.0, 1.0)  var persistence := 0.5
 @export var line_color := Color.GREEN
 
@@ -43,6 +42,7 @@ const ZOOM_FACTOR := 4.0 / 3.0
 const MAX_ZOOM := 64.0
 const MAX_SCALE := Vector2(MAX_ZOOM, MAX_ZOOM)
 
+var plot_scale := 1.0
 var vector_transform := Transform2D.IDENTITY
 
 var paused := false:
