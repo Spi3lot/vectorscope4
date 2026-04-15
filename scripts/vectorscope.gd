@@ -93,7 +93,7 @@ func _handle_input_event_mouse_button(event: InputEventMouseButton) -> void:
 
     if is_zoom_in or is_zoom_out:
         var zoom_multiplier := ZOOM_FACTOR if is_zoom_in else (1.0 / ZOOM_FACTOR)
-        var mouse_pos := get_local_mouse_position()
+        var mouse_pos := sub_viewport_container.get_local_mouse_position()
 
         if paused:
             var old_pivot := sub_viewport_container.pivot_offset
