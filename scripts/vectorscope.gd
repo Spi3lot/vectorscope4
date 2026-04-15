@@ -61,6 +61,7 @@ func _ready() -> void:
     WasapiLoopbackRecorder.BufferLength = buffer_length
     audio_player.finished.connect(_select_file)
     %FileDialog.file_selected.connect(_on_file_selected)
+    get_window().size_changed.connect(_clear_sub_viewport)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -140,7 +141,11 @@ func _bake_raster_to_vector() -> void:
     sub_viewport_container.scale = Vector2.ONE
 
     if not raster_transform.is_equal_approx(Transform2D.IDENTITY):
-        sub_viewport_container.sub_viewport.render_target_clear_mode = SubViewport.CLEAR_MODE_ONCE
+        _clear_sub_viewport()
+
+
+func _clear_sub_viewport():
+    sub_viewport_container.sub_viewport.render_target_clear_mode = SubViewport.CLEAR_MODE_ONCE
 
 
 func _on_file_selected(path: String) -> void:
