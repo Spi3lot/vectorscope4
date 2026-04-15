@@ -139,6 +139,9 @@ func _bake_raster_to_vector() -> void:
     sub_viewport_container.pivot_offset = Vector2.ZERO
     sub_viewport_container.scale = Vector2.ONE
 
+    if not raster_transform.is_equal_approx(Transform2D.IDENTITY):
+        sub_viewport_container.sub_viewport.render_target_clear_mode = SubViewport.CLEAR_MODE_ONCE
+
 
 func _on_file_selected(path: String) -> void:
     audio_player.stream = AudioLoader.loadfile(path)
