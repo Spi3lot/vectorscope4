@@ -67,7 +67,7 @@ public class WasapiCapturePipeline
     ///     A <code>Vector2[]</code> containing the requested amount of stereo audio frames
     ///     or nothing if there is not enough data available yet. 
     /// </returns>
-    public Vector2[] ReadStereo(int requestedFrameCount, float scale = 1)
+    public Vector2[] ReadStereo(int requestedFrameCount)
     {
         if (!_pipe.Reader.TryRead(out var result))
         {
@@ -99,7 +99,7 @@ public class WasapiCapturePipeline
 
         for (int i = 0; i < requestedFrameCount; i++)
         {
-            vectors[i] = scale * ReadStereoFrame(ref reader);
+            vectors[i] = ReadStereoFrame(ref reader);
         }
 
         _pipe.Reader.AdvanceTo(reader.Position);

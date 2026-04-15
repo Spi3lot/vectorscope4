@@ -1,14 +1,13 @@
 extends Control
 
-@export var volume_label: Label
-@export var volume_slider: VSlider
 @export var loopback_button: CheckButton
 @export var loopback_error_label: Label
-@export var persistence_slider: HSlider
-@export var penalty_slider: HSlider
+@export var persistence_slider: Slider
+@export var penalty_slider: Slider
 @export var pan_control: Control
 @export var speed_control: Control
-@export var seek_slider: HSlider
+@export var volume_control: Control
+@export var seek_slider: Slider
 
 var dragging := false
 
@@ -25,15 +24,11 @@ func _process(_delta: float) -> void:
 
     if not dragging and player.stream:
         seek_slider.value = player.get_playback_position() / player.stream.get_length()
-    
+
 
 func _on_volume_value_changed(value: float) -> void:
+    %Vectorscope.audio_player.volume_db = value
     %Vectorscope.plot_scale = db_to_linear(value)
-    
-    if %Vectorscope.loopback:
-        WasapiLoopbackRecorder.Scale = %Vectorscope.plot_scale
-    else:
-        %Vectorscope.audio_player.volume_db = value
 
 
 func _on_penalty_value_changed(value: float) -> void:
@@ -87,15 +82,9 @@ func _on_loopback_toggled(toggled_on: bool) -> void:
 
     pan_control.visible = not toggled_on
     speed_control.visible = not toggled_on
+    volume_control.visible = not toggled_on
     seek_slider.visible = not toggled_on
     %Vectorscope.loopback = toggled_on
-    
-    if toggled_on:
-        volume_slider.value = linear_to_db(WasapiLoopbackRecorder.Scale)
-        volume_label.text = "Scale"
-    else:
-        volume_slider.value = %Vectorscope.audio_player.volume_db
-        volume_label.text = "Volume"
 
 
 func _get_error_text(error: Error) -> String:

@@ -59,16 +59,16 @@ metadata/_edit_lock_ = true
 [node name="SubViewport" type="SubViewport" parent="Vectorscope/VectorscopeSubViewportContainer" unique_id=1193102148]
 disable_3d = true
 handle_input_locally = false
+gui_disable_input = true
 size = Vector2i(1152, 648)
 render_target_clear_mode = 1
-render_target_update_mode = 4
 
 [node name="Drawer" type="Node2D" parent="Vectorscope/VectorscopeSubViewportContainer/SubViewport" unique_id=2036080093]
 script = ExtResource("4_tbgi4")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=499037899]
 
-[node name="MarginContainer" type="MarginContainer" parent="UI" unique_id=25295232 node_paths=PackedStringArray("volume_label", "volume_slider", "loopback_button", "loopback_error_label", "persistence_slider", "penalty_slider", "pan_control", "speed_control", "seek_slider")]
+[node name="MarginContainer" type="MarginContainer" parent="UI" unique_id=25295232 node_paths=PackedStringArray("loopback_button", "loopback_error_label", "persistence_slider", "penalty_slider", "pan_control", "speed_control", "volume_control", "seek_slider")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -79,14 +79,13 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 script = ExtResource("3_lpaer")
-volume_label = NodePath("VBoxContainer/HBoxContainer/Volume/Control/Label")
-volume_slider = NodePath("VBoxContainer/HBoxContainer/Volume/VSlider")
 loopback_button = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Loopback/HBoxContainer/CheckButton")
 loopback_error_label = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Loopback/HBoxContainer/ErrorLabel")
 persistence_slider = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Persistence/HSlider")
 penalty_slider = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Penalty/HSlider")
 pan_control = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Pan")
 speed_control = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Speed")
+volume_control = NodePath("VBoxContainer/HBoxContainer/VBoxContainer/Volume")
 seek_slider = NodePath("VBoxContainer/HSlider")
 metadata/_edit_lock_ = true
 
@@ -95,36 +94,6 @@ layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="UI/MarginContainer/VBoxContainer" unique_id=1580705418]
 layout_mode = 2
-
-[node name="Volume" type="HBoxContainer" parent="UI/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1274472317]
-layout_mode = 2
-
-[node name="Control" type="Control" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/Volume" unique_id=713211385]
-visible = false
-custom_minimum_size = Vector2(24, 50)
-layout_mode = 2
-
-[node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/Volume/Control" unique_id=858546287]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 6.0
-offset_top = -2.0
-offset_right = 65.0
-offset_bottom = 20.333374
-grow_vertical = 0
-rotation = -1.5707964
-text = "Volume"
-
-[node name="VSlider" type="VSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/Volume" unique_id=593845710]
-layout_mode = 2
-tooltip_text = "Volume/scale of the audio/plot"
-focus_mode = 0
-mouse_default_cursor_shape = 16
-min_value = -20.0
-max_value = 20.0
-allow_greater = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer/HBoxContainer" unique_id=2072327174]
 layout_mode = 2
@@ -145,7 +114,6 @@ size_flags_horizontal = 0
 layout_mode = 2
 size_flags_horizontal = 0
 tooltip_text = "Whether to capture all currently replayed audio or play a specific audio file"
-focus_mode = 0
 mouse_default_cursor_shape = 16
 
 [node name="ErrorLabel" type="Label" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Loopback/HBoxContainer" unique_id=396121547]
@@ -167,7 +135,6 @@ text = "Line Antialiasing"
 layout_mode = 2
 size_flags_horizontal = 0
 tooltip_text = "Whether to antialias lines or not"
-focus_mode = 0
 mouse_default_cursor_shape = 16
 button_pressed = true
 
@@ -181,7 +148,7 @@ text = "Line Width"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Width" unique_id=1904914006]
 layout_mode = 2
 tooltip_text = "How wide each line appears"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 min_value = 1.0
 max_value = 10.0
@@ -197,7 +164,7 @@ text = "Line Glow"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Glow" unique_id=1746482621]
 layout_mode = 2
 tooltip_text = "How bright each line appears"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 max_value = 1.0
 step = 0.05
@@ -213,7 +180,7 @@ text = "Line Penalty"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Penalty" unique_id=573996884]
 layout_mode = 2
 tooltip_text = "Factor that scales the darkness of a line based on its length"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 value = 20.0
 
@@ -227,7 +194,7 @@ text = "Persistence"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Persistence" unique_id=219106689]
 layout_mode = 2
 tooltip_text = "Lifetime of each drawn frame of lines"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 max_value = 1.0
 step = 0.01
@@ -243,7 +210,7 @@ text = "Pan"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Pan" unique_id=1926006206]
 layout_mode = 2
 tooltip_text = "Panning of the stereo audio from left to right and inbetween"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 min_value = -1.0
 max_value = 1.0
@@ -259,7 +226,7 @@ text = "Speed / Pitch"
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Speed" unique_id=1235202381]
 layout_mode = 2
 tooltip_text = "Multiplier for the song speed and pitch"
-focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 16
 min_value = 0.01
 max_value = 4.0
@@ -277,16 +244,32 @@ sampler_visible = false
 color_modes_visible = false
 presets_visible = false
 
+[node name="Volume" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=1397296354]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Volume" unique_id=858546287]
+layout_mode = 2
+text = "Volume"
+
+[node name="VSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Volume" unique_id=1048892484]
+layout_mode = 2
+tooltip_text = "Perceived loudness of the audio"
+mouse_force_pass_scroll_events = false
+mouse_default_cursor_shape = 16
+min_value = -20.0
+max_value = 20.0
+allow_greater = true
+
 [node name="HSlider" type="HSlider" parent="UI/MarginContainer/VBoxContainer" unique_id=1808778296]
 layout_mode = 2
 size_flags_vertical = 10
 focus_mode = 0
+mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 2
 max_value = 1.0
 step = 0.001
 scrollable = false
 
-[connection signal="value_changed" from="UI/MarginContainer/VBoxContainer/HBoxContainer/Volume/VSlider" to="UI/MarginContainer" method="_on_volume_value_changed"]
 [connection signal="toggled" from="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Loopback/HBoxContainer/CheckButton" to="UI/MarginContainer" method="_on_loopback_toggled"]
 [connection signal="toggled" from="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/AntiAliasing/CheckButton" to="UI/MarginContainer" method="_on_antialiasing_toggled"]
 [connection signal="value_changed" from="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Width/HSlider" to="UI/MarginContainer" method="_on_width_value_changed"]
@@ -295,5 +278,6 @@ scrollable = false
 [connection signal="value_changed" from="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Persistence/HSlider" to="UI/MarginContainer" method="_on_persistence_value_changed"]
 [connection signal="value_changed" from="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Pan/HSlider" to="UI/MarginContainer" method="_on_pan_value_changed"]
 [connection signal="value_changed" from="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Speed/HSlider" to="UI/MarginContainer" method="_on_speed_value_changed"]
+[connection signal="value_changed" from="UI/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/Volume/VSlider" to="UI/MarginContainer" method="_on_volume_value_changed"]
 [connection signal="drag_ended" from="UI/MarginContainer/VBoxContainer/HSlider" to="UI/MarginContainer" method="_on_seek_drag_ended"]
 [connection signal="drag_started" from="UI/MarginContainer/VBoxContainer/HSlider" to="UI/MarginContainer" method="_on_seek_drag_started"]

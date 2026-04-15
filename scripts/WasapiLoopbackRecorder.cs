@@ -18,10 +18,6 @@ public partial class WasapiLoopbackRecorder : Node
 
     private CancellationTokenSource _cts;
 
-    public bool Paused => _capture.CaptureState == CaptureState.Stopped;
-
-    public float Scale { get; set; } = 1;
-
     public double BufferLength
     {
         get => _pipeline.BufferLength;
@@ -32,11 +28,11 @@ public partial class WasapiLoopbackRecorder : Node
 
     public int GetFramesAvailable() => _pipeline.GetFramesAvailable();
 
-    public Vector2[] GetBuffer(int frames) => _pipeline.ReadStereo(frames, Scale);
+    public Vector2[] GetBuffer(int frames) => _pipeline.ReadStereo(frames);
 
     public void TogglePaused()
     {
-        if (Paused)
+        if (_capture.CaptureState == CaptureState.Stopped)
         {
             _cts = new CancellationTokenSource();
             _capture.StartRecording();

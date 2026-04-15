@@ -3,18 +3,27 @@ extends Node2D
 # 0.1 means we consume the dt amount + 10% of the backlog (=> backlog decays exponentially).
 # 10% feels safer to me than e.g. 25% as that increases the
 # backlog's half-life from ~2 frames to ~6 frames which leaves more room for high fps
-const CATCH_UP_SPEED: float = 0.1
+const CATCH_UP_SPEED := 0.1
 const SQRT_8 := sqrt(8.0)
+
 var frame_buffer := PackedVector2Array()
 var line_positions := PackedVector2Array()
 var line_colors := PackedColorArray()
 var line_whites := PackedColorArray()
+var paused := false
+
 var time_multiplier: float
 var sample_rate: float
 
 func _process(delta: float) -> void:
-    if (%Vectorscope.loopback and WasapiLoopbackRecorder.Paused) or (not %Vectorscope.loopback and %Vectorscope.audio_player.stream_paused):
+    if %Vectorscope.paused:
+        if not paused:
+            paused = true
+            queue_redraw()
+
         return
+
+    paused = false
 
     var previous_frame := Vector2.ZERO \
         if frame_buffer.is_empty() \
@@ -39,6 +48,9 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
+    if paused:
+        return
+
     _draw_fade_rect()
     _draw_multilines()
 
@@ -73,8 +85,9 @@ func _update_line_properties(previous_frame: Vector2) -> void:
 func _frame_to_screen_space(frame: Vector2) -> Vector2:
     frame.y = -frame.y
     var viewport_size: Vector2i = %Vectorscope.sub_viewport_container.sub_viewport.size
-    var min_aspect := mini(viewport_size.x, viewport_size.y)
-    return (frame * min_aspect + Vector2(viewport_size)) / 2
+    var min_aspect: int = mini(viewport_size.x, viewport_size.y)
+    var screen_pos: Vector2 = (frame * (min_aspect / %Vectorscope.plot_scale) + Vector2(viewport_size)) / 2
+    return %Vectorscope.vector_transform * screen_pos
 
 
 func _calc_line_color(previous_frame: Vector2, current_frame: Vector2) -> Color:
