@@ -18,8 +18,6 @@ public partial class WasapiLoopbackRecorder : Node
 
     private CancellationTokenSource _cts;
 
-    public bool Paused => _capture.CaptureState == CaptureState.Stopped;
-
     public float Scale { get; set; } = 1;
 
     public double BufferLength
@@ -36,7 +34,7 @@ public partial class WasapiLoopbackRecorder : Node
 
     public void TogglePaused()
     {
-        if (Paused)
+        if (_capture.CaptureState == CaptureState.Stopped)
         {
             _cts = new CancellationTokenSource();
             _capture.StartRecording();
