@@ -11,6 +11,8 @@ class_name Vectorscope
 @export var loopback := true:
     set(value):
         loopback = value
+        paused = false
+        plot_scale = 1.0 if loopback else db_to_linear(audio_player.volume_db)
         audio_player.stream = null
         %FileDialog.visible = not (loopback or Engine.is_editor_hint())
 
@@ -42,7 +44,11 @@ const MAX_ZOOM := 64.0
 const MAX_SCALE := Vector2(MAX_ZOOM, MAX_ZOOM)
 
 var vector_transform := Transform2D.IDENTITY
-var paused := false
+
+var paused := false:
+    set(value):
+        paused = value
+        if not paused: _bake_raster_to_vector()
 
 @onready var bus_idx := AudioServer.get_bus_index(&"Player")
 @onready var capture_idx := AudioServer.get_bus_effect_count(bus_idx) - 1
@@ -107,9 +113,6 @@ func _handle_input_event_key(event: InputEventKey) -> void:
     match event.keycode:
         KEY_SPACE:
             paused = not paused
-
-            if not paused:
-                _bake_raster_to_vector()
 
             if loopback:
                 WasapiLoopbackRecorder.TogglePaused()
