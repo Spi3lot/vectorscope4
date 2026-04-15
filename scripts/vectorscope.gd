@@ -37,7 +37,7 @@ class_name Vectorscope
 @export var audio_player: AudioStreamPlayer
 @export var sub_viewport_container: FixedSubViewportContainer
 
-const ZOOM_FACTOR := 1.25
+const ZOOM_FACTOR := 4.0 / 3.0
 const MAX_ZOOM := 64.0
 const MAX_SCALE := Vector2(MAX_ZOOM, MAX_ZOOM)
 
