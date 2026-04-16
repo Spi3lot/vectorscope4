@@ -53,6 +53,10 @@ func _on_persistence_value_changed(value: float) -> void:
     vectorscope.persistence = value
 
 
+func _on_color_changed(color: Color) -> void:
+    vectorscope.line_color = color
+
+
 func _on_pan_value_changed(value: float) -> void:
     var panner: AudioEffectPanner = AudioServer.get_bus_effect(vectorscope.bus_idx, 0)
     panner.pan = value
@@ -77,6 +81,7 @@ func _on_seek_drag_ended(value_changed: bool) -> void:
 func _on_loopback_toggled(toggled_on: bool) -> void:
     var error: Error = WasapiLoopbackRecorder.SetRecording(toggled_on)
     loopback_error_label.text = _get_error_text(error)
+    loopback_error_label.visible = not loopback_error_label.text.is_empty()
 
     if error != OK:
         loopback_button.set_pressed_no_signal(not toggled_on)
