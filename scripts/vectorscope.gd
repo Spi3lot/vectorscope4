@@ -13,8 +13,11 @@ class_name Vectorscope
         loopback = value
         paused = false
         plot_scale = 1.0 if loopback else db_to_linear(audio_player.volume_db)
-        audio_player.stream = null
-        _select_file()
+
+        if audio_player.stream:
+            audio_player.stream_paused = loopback
+        else:
+            _select_file()
 
 @export var line_antialiasing := true:
     set(value):
@@ -59,7 +62,7 @@ func _ready() -> void:
         return
 
     WasapiLoopbackRecorder.BufferLength = buffer_length
-    audio_player.finished.connect(_select_file)
+    audio_player.finished.connect(audio_player.play)
     %FileDialog.file_selected.connect(_on_file_selected)
     get_window().size_changed.connect(_clear_sub_viewport)
 
