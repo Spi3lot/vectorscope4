@@ -2,11 +2,17 @@ extends Control
 
 @export var loopback_button: CheckButton
 @export var loopback_error_label: Label
+@export var antialiasing_button: CheckButton
 @export var persistence_slider: Slider
+@export var width_slider: Slider
+@export var glow_slider: Slider
 @export var penalty_slider: Slider
+@export var color_picker_button: ColorPickerButton
+
 @export var pan_control: Control
 @export var speed_control: Control
 @export var volume_control: Control
+
 @export var seek_slider: Slider
 
 var dragging := false
@@ -15,8 +21,12 @@ var dragging := false
 
 func _ready() -> void:
     loopback_button.button_pressed = vectorscope.loopback
-    persistence_slider.value = vectorscope.persistence
+    antialiasing_button.button_pressed = vectorscope.line_antialiasing
+    width_slider.value = vectorscope.line_width
+    glow_slider.value = vectorscope.line_glow
     penalty_slider.value = vectorscope.length_penalty
+    persistence_slider.value = vectorscope.persistence
+    color_picker_button.color = vectorscope.line_color
     get_tree().root.mouse_entered.connect(show)
     get_tree().root.mouse_exited.connect(hide)
 
