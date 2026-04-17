@@ -14,7 +14,7 @@ class_name Vectorscope
         paused = false
         plot_scale = 1.0 if loopback else db_to_linear(audio_player.volume_db)
         audio_player.stream = null
-        %FileDialog.visible = not (loopback or Engine.is_editor_hint())
+        _select_file()
 
 @export var line_antialiasing := true:
     set(value):
@@ -100,7 +100,7 @@ func _handle_input_event_key(event: InputEventKey) -> void:
             else:
                 AudioServer.set_bus_effect_enabled(bus_idx, capture_idx, audio_player.stream_paused)
                 audio_player.stream_paused = not audio_player.stream_paused
-        KEY_ESCAPE when not loopback and not %FileDialog.visible:
+        KEY_ESCAPE:
             _select_file()
         KEY_R:
             _reset_zoom()
@@ -155,6 +155,9 @@ func _on_file_selected(path: String) -> void:
 
 
 func _select_file() -> void:
+    if loopback or Engine.is_editor_hint():
+        return
+
     %FileDialog.visible = true
 
 
