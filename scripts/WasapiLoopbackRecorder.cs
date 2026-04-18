@@ -35,6 +35,7 @@ public partial class WasapiLoopbackRecorder : Node
         if (_capture.CaptureState == CaptureState.Stopped)
         {
             _cts = new CancellationTokenSource();
+            _pipeline.Reset();
             _capture.StartRecording();
         }
         else
@@ -75,6 +76,7 @@ public partial class WasapiLoopbackRecorder : Node
         }
 
         _cts = new CancellationTokenSource();
+        _pipeline.Reset();
         _capture.RecordingStopped += RecordingStopped;
         _capture.DataAvailable += DataAvailable;
         _capture.StartRecording();
@@ -85,7 +87,6 @@ public partial class WasapiLoopbackRecorder : Node
     {
         _capture?.Dispose();
         _capture = null;
-        _pipeline.Reset();
         return Error.Ok;
     }
 
