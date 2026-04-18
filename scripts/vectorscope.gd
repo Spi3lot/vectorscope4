@@ -15,7 +15,7 @@ class_name Vectorscope
         plot_scale = 1.0 if loopback else db_to_linear(audio_player.volume_db)
 
         if audio_player.stream:
-            audio_player.stream_paused = loopback
+            _set_audio_player_stream_paused(loopback)
         else:
             _select_file()
 
@@ -104,8 +104,7 @@ func _handle_input_event_key(event: InputEventKey) -> void:
             if loopback:
                 WasapiLoopbackRecorder.TogglePaused()
             else:
-                AudioServer.set_bus_effect_enabled(bus_idx, capture_idx, audio_player.stream_paused)
-                audio_player.stream_paused = not audio_player.stream_paused
+                _set_audio_player_stream_paused(paused)
         KEY_ESCAPE:
             _select_file()
         KEY_R:
@@ -139,6 +138,11 @@ func _reset_zoom() -> void:
         vector_transform = Transform2D.IDENTITY
 
 
+func _set_audio_player_stream_paused(value: bool) -> void:
+    audio_player.stream_paused = value
+    AudioServer.set_bus_effect_enabled(bus_idx, capture_idx, not value)
+
+
 func _bake_raster_to_vector() -> void:
     var raster_transform := sub_viewport_container.get_transform()
     vector_transform = raster_transform * vector_transform
@@ -157,7 +161,7 @@ func _clear_sub_viewport():
 func _on_file_selected(path: String) -> void:
     audio_player.stream = AudioLoader.loadfile(path)
     audio_player.play()
-    AudioServer.set_bus_effect_enabled(bus_idx, capture_idx, true)
+    _set_audio_player_stream_paused(loopback)
 
 
 func _select_file() -> void:
