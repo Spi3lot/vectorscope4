@@ -50,8 +50,11 @@ var vector_transform := Transform2D.IDENTITY
 
 var paused := false:
     set(value):
+        var toggled := paused != value
         paused = value
-        if not paused: _bake_raster_to_vector()
+
+        if toggled and not paused:
+            _bake_raster_to_vector()
 
 @onready var bus_idx := AudioServer.get_bus_index(&"Player")
 @onready var capture_idx := AudioServer.get_bus_effect_count(bus_idx) - 1
