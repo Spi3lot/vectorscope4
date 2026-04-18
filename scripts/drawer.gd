@@ -44,7 +44,7 @@ func _process(delta: float) -> void:
         var size: int = _optimal_frame_buffer_size(delta, available)
         frame_buffer = vectorscope.capture.get_buffer(size)
 
-    if len(frame_buffer) > 0:
+    if frame_buffer.size() > 0:
         _update_line_properties(previous_frame)
         queue_redraw()
 
@@ -70,7 +70,7 @@ func _optimal_frame_buffer_size(dt: float, frames_available: int) -> int:
 
 
 func _update_line_properties(previous_frame: Vector2) -> void:
-    var frame_buffer_size := len(frame_buffer)
+    var frame_buffer_size := frame_buffer.size()
     line_positions.resize(frame_buffer_size * 2)
     line_colors.resize(frame_buffer_size)
     line_whites.resize(frame_buffer_size)
@@ -103,7 +103,7 @@ func _calc_line_color(previous_frame: Vector2, current_frame: Vector2) -> Color:
 func _draw_fade_rect() -> void:
     var sub_viewport := vectorscope.sub_viewport_container.sub_viewport
     var rect := Rect2(Vector2.ZERO, sub_viewport.size)
-    var audio_duration := len(frame_buffer) / sample_rate
+    var audio_duration := frame_buffer.size() / sample_rate
     var exponent := 25.0 * time_multiplier * audio_duration
     var alpha := 1.0 - vectorscope.persistence ** exponent
     draw_rect(rect, Color(Color.BLACK, alpha), true)
@@ -113,7 +113,7 @@ func _draw_fade_rect() -> void:
 # multiline uses segment-by-segment coloring, while
 # polyline uses point-by-point coloring
 func _draw_multilines() -> void:
-    if len(line_positions) == 0:
+    if line_positions.size() == 0:
         return
 
     draw_multiline_colors(
