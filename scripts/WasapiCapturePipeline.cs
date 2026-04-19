@@ -62,7 +62,6 @@ public class WasapiCapturePipeline
     ///        which otherwise could make them struggle with keeping
     ///        up a high and somewhat constant framerate.
     /// </param>
-    /// <param name="scale">The factor to multiply each frame by</param>
     /// <returns>
     ///     A <code>Vector2[]</code> containing the requested amount of stereo audio frames
     ///     or nothing if there is not enough data available yet. 
