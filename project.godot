@@ -18,7 +18,7 @@ config/name="Vectorscope"
 run/main_scene="uid://dey7wd4sj1xjr"
 config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 run/delta_smoothing=false
-config/icon="uid://1hdyty0jiq4p"
+config/icon="res://itch32.png"
 
 [audio]
 
